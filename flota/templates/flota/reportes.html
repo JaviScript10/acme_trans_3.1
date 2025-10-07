@@ -1,0 +1,123 @@
+{% extends 'flota/base.html' %}
+
+{% block title %}Reportes - ACME Trans{% endblock %}
+
+{% block content %}
+<div class="card-custom">
+    <h2 class="mb-4"><i class="fas fa-chart-bar"></i> Centro de Reportes</h2>
+    <p class="text-muted">Análisis y reportes del sistema de gestión de flota</p>
+</div>
+
+<div class="row">
+    <!-- Reporte Operacional -->
+    <div class="col-md-6 mb-4">
+        <div class="card-custom h-100">
+            <div class="text-center mb-3">
+                <i class="fas fa-truck fa-4x text-primary"></i>
+            </div>
+            <h4 class="text-center">Reporte Operacional</h4>
+            <p class="text-muted text-center">Estado de la flota y análisis de operaciones</p>
+            <ul class="list-unstyled">
+                <li><i class="fas fa-check text-success"></i> Estado de vehículos por centro</li>
+                <li><i class="fas fa-check text-success"></i> Disponibilidad de flota</li>
+                <li><i class="fas fa-check text-success"></i> Kilometrajes y rendimiento</li>
+                <li><i class="fas fa-check text-success"></i> Mantenimientos realizados</li>
+            </ul>
+            <button class="btn btn-custom w-100 mt-3">
+                <i class="fas fa-file-pdf"></i> Generar Reporte
+            </button>
+        </div>
+    </div>
+
+    <!-- Reporte Financiero -->
+    <div class="col-md-6 mb-4">
+        <div class="card-custom h-100">
+            <div class="text-center mb-3">
+                <i class="fas fa-dollar-sign fa-4x text-success"></i>
+            </div>
+            <h4 class="text-center">Análisis Financiero</h4>
+            <p class="text-muted text-center">Costos y rentabilidad de la flota</p>
+            <ul class="list-unstyled">
+                <li><i class="fas fa-check text-success"></i> Costos de mantenimiento</li>
+                <li><i class="fas fa-check text-success"></i> Gastos por vehículo</li>
+                <li><i class="fas fa-check text-success"></i> Comparativa de proveedores</li>
+                <li><i class="fas fa-check text-success"></i> ROI por centro operacional</li>
+            </ul>
+            <button class="btn btn-custom w-100 mt-3">
+                <i class="fas fa-file-excel"></i> Generar Reporte
+            </button>
+        </div>
+    </div>
+
+    <!-- Dashboard Ejecutivo -->
+    <div class="col-md-6 mb-4">
+        <div class="card-custom h-100">
+            <div class="text-center mb-3">
+                <i class="fas fa-chart-pie fa-4x text-warning"></i>
+            </div>
+            <h4 class="text-center">Dashboard Ejecutivo</h4>
+            <p class="text-muted text-center">KPIs y métricas estratégicas</p>
+            <ul class="list-unstyled">
+                <li><i class="fas fa-check text-success"></i> Indicadores clave de rendimiento</li>
+                <li><i class="fas fa-check text-success"></i> Eficiencia operacional</li>
+                <li><i class="fas fa-check text-success"></i> Tendencias y proyecciones</li>
+                <li><i class="fas fa-check text-success"></i> Análisis comparativo mensual</li>
+            </ul>
+            <button class="btn btn-custom w-100 mt-3">
+                <i class="fas fa-chart-line"></i> Ver Dashboard
+            </button>
+        </div>
+    </div>
+
+    <!-- Reporte de Mantenimientos -->
+    <div class="col-md-6 mb-4">
+        <div class="card-custom h-100">
+            <div class="text-center mb-3">
+                <i class="fas fa-wrench fa-4x text-danger"></i>
+            </div>
+            <h4 class="text-center">Historial de Mantenimientos</h4>
+            <p class="text-muted text-center">Seguimiento completo de mantenimientos</p>
+            <ul class="list-unstyled">
+                <li><i class="fas fa-check text-success"></i> Mantenimientos programados vs realizados</li>
+                <li><i class="fas fa-check text-success"></i> Costos por tipo de mantenimiento</li>
+                <li><i class="fas fa-check text-success"></i> Desviaciones de presupuesto</li>
+                <li><i class="fas fa-check text-success"></i> Tiempos de inactividad</li>
+            </ul>
+            <button class="btn btn-custom w-100 mt-3">
+                <i class="fas fa-file-alt"></i> Generar Reporte
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas Rápidas -->
+<div class="card-custom">
+    <h4 class="mb-4"><i class="fas fa-tachometer-alt"></i> Estadísticas Rápidas</h4>
+    <div class="row text-center">
+        <div class="col-md-3">
+            <div class="border rounded p-3">
+                <h3 class="text-primary mb-0">29</h3>
+                <small class="text-muted">Total Vehículos</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="border rounded p-3">
+                <h3 class="text-success mb-0">3</h3>
+                <small class="text-muted">Centros Operacionales</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="border rounded p-3">
+                <h3 class="text-warning mb-0">-</h3>
+                <small class="text-muted">Mantenimientos Este Mes</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="border rounded p-3">
+                <h3 class="text-info mb-0">-</h3>
+                <small class="text-muted">Costo Total Mantenimientos</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,213 @@
+{% extends 'flota/base.html' %}
+
+{% block title %}{{ vehiculo.patente }} - ACME Trans{% endblock %}
+
+{% block content %}
+<div class="card-custom">
+    <!-- Header con Acciones -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="fas fa-truck"></i> {{ vehiculo.patente }}</h2>
+            <p class="text-muted mb-0">{{ vehiculo.marca }} {{ vehiculo.modelo }} ({{ vehiculo.año }})</p>
+        </div>
+        <div>
+            <a href="{% url 'flota:vehiculos' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+            <a href="{% url 'flota:vehiculo_actualizar_km' vehiculo.pk %}" class="btn btn-warning">
+                <i class="fas fa-tachometer-alt"></i> Actualizar KM
+            </a>
+            <a href="{% url 'flota:vehiculo_editar' vehiculo.pk %}" class="btn btn-primary">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            <a href="{% url 'flota:vehiculo_eliminar' vehiculo.pk %}" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Eliminar
+            </a>
+        </div>
+    </div>
+
+    <!-- Información Principal -->
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Datos Básicos -->
+            <div class="card mb-3">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Información Básica</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <strong><i class="fas fa-id-card"></i> Patente:</strong>
+                            <p class="mb-0">{{ vehiculo.patente }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong><i class="fas fa-truck"></i> Marca/Modelo:</strong>
+                            <p class="mb-0">{{ vehiculo.marca }} {{ vehiculo.modelo }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong><i class="fas fa-calendar"></i> Año:</strong>
+                            <p class="mb-0">{{ vehiculo.año }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong><i class="fas fa-weight-hanging"></i> Tipo:</strong>
+                            <p class="mb-0">
+                                <span
+                                    class="badge {% if vehiculo.tipo_capacidad == 'GC' %}bg-primary{% else %}bg-info{% endif %}">
+                                    {{ vehiculo.get_tipo_capacidad_display }}
+                                </span>
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong><i class="fas fa-map-marker-alt"></i> Centro:</strong>
+                            <p class="mb-0">{{ vehiculo.centro_operacion.nombre }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong><i class="fas fa-check-circle"></i> Estado:</strong>
+                            <p class="mb-0">
+                                <span
+                                    class="badge {% if vehiculo.estado == 'operativo' %}bg-success{% elif vehiculo.estado == 'mantenimiento' %}bg-warning{% else %}bg-danger{% endif %}">
+                                    {{ vehiculo.get_estado_display }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Datos Técnicos -->
+            <div class="card mb-3">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-cog"></i> Datos Técnicos</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <strong><i class="fas fa-hashtag"></i> Número de Chasis:</strong>
+                            <p class="mb-0">{{ vehiculo.numero_chasis|default:"No especificado" }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong><i class="fas fa-hashtag"></i> Número de Motor:</strong>
+                            <p class="mb-0">{{ vehiculo.numero_motor|default:"No especificado" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Datos Financieros -->
+            {% if vehiculo.valor_adquisicion or vehiculo.fecha_adquisicion %}
+            <div class="card mb-3">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-dollar-sign"></i> Datos Financieros</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% if vehiculo.valor_adquisicion %}
+                        <div class="col-md-6 mb-3">
+                            <strong><i class="fas fa-money-bill-wave"></i> Valor Adquisición:</strong>
+                            <p class="mb-0">${{ vehiculo.valor_adquisicion|floatformat:0 }}</p>
+                        </div>
+                        {% endif %}
+                        {% if vehiculo.fecha_adquisicion %}
+                        <div class="col-md-6 mb-3">
+                            <strong><i class="fas fa-calendar-check"></i> Fecha Adquisición:</strong>
+                            <p class="mb-0">{{ vehiculo.fecha_adquisicion|date:"d/m/Y" }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Observaciones -->
+            {% if vehiculo.observaciones %}
+            <div class="card mb-3">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-sticky-note"></i> Observaciones</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">{{ vehiculo.observaciones }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Panel Lateral -->
+        <div class="col-md-4">
+            <!-- Kilometraje -->
+            <div class="card mb-3 border-warning">
+                <div class="card-body text-center">
+                    <i class="fas fa-tachometer-alt fa-3x text-warning mb-2"></i>
+                    <h3 class="mb-0">{{ vehiculo.kilometraje_actual|floatformat:0 }} km</h3>
+                    <p class="text-muted mb-2">Kilometraje Actual</p>
+                    <hr>
+                    <p class="mb-1"><strong>Próximo Mantenimiento:</strong></p>
+                    <h4 class="text-primary">{{ vehiculo.proximo_mantenimiento_km|floatformat:0 }} km</h4>
+                    <p class="mb-0">
+                        <small
+                            class="{% if vehiculo.km_hasta_mantenimiento <= 500 %}text-danger{% elif vehiculo.km_hasta_mantenimiento <= 2000 %}text-warning{% else %}text-success{% endif %}">
+                            Faltan {{ vehiculo.km_hasta_mantenimiento|floatformat:0 }} km
+                        </small>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Alerta de Mantenimiento -->
+            {% if vehiculo.km_hasta_mantenimiento <= 2000 %} <div
+                class="alert {% if vehiculo.km_hasta_mantenimiento <= 500 %}alert-danger{% else %}alert-warning{% endif %}"
+                role="alert">
+                <h6 class="alert-heading">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    {% if vehiculo.km_hasta_mantenimiento <= 500 %}¡URGENTE!{% else %}Atención{% endif %} </h6>
+                        <p class="mb-0">Este vehículo necesita mantenimiento pronto.</p>
+                        <a href="/admin/flota/mantenimiento/add/?vehiculo={{ vehiculo.id }}"
+                            class="btn btn-sm btn-warning mt-2">
+                            <i class="fas fa-wrench"></i> Programar Ahora
+                        </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Historial de Mantenimientos -->
+<div class="card mt-4">
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0"><i class="fas fa-history"></i> Historial de Mantenimientos</h5>
+    </div>
+    <div class="card-body">
+        {% if mantenimientos %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Tipo</th>
+                        <th>Proveedor</th>
+                        <th>Estado</th>
+                        <th>Costo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mant in mantenimientos %}
+                    <tr>
+                        <td>{{ mant.fecha_programada|date:"d/m/Y" }}</td>
+                        <td>{{ mant.tipo_mantenimiento.nombre }}</td>
+                        <td>{{ mant.proveedor.nombre }}</td>
+                        <td>
+                            <span
+                                class="badge {% if mant.estado == 'completado' %}bg-success{% elif mant.estado == 'en_proceso' %}bg-warning{% else %}bg-info{% endif %}">
+                                {{ mant.get_estado_display }}
+                            </span>
+                        </td>
+                        <td>${{ mant.costo_estimado|floatformat:0 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center mb-0">No hay mantenimientos registrados</p>
+        {% endif %}
+    </div>
+</div>
+</div>
+{% endblock %}

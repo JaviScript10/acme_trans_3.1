@@ -1,0 +1,137 @@
+{% extends 'flota/base.html' %}
+
+{% block title %}Alertas - ACME Trans{% endblock %}
+
+{% block content %}
+<div class="card-custom">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="fas fa-bell"></i> Centro de Alertas</h2>
+            <p class="text-muted mb-0">Notificaciones y alertas del sistema</p>
+        </div>
+        <div>
+            <span class="badge bg-danger fs-5">{{ vehiculos_alerta|length }}</span>
+            <span class="text-muted">alertas activas</span>
+        </div>
+    </div>
+
+    <!-- Resumen de Alertas -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card border-danger">
+                <div class="card-body text-center">
+                    <i class="fas fa-exclamation-circle fa-3x text-danger mb-2"></i>
+                    <h3 class="text-danger mb-0">
+                        {% for v in vehiculos_alerta %}{% if v.nivel == 'critico' %}1{% endif %}{% endfor %}
+                        {{ vehiculos_alerta|length|add:"-1"|default:"0" }}
+                    </h3>
+                    <p class="text-muted mb-0">Alertas Críticas</p>
+                    <small class="text-muted">Requieren atención inmediata</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-warning">
+                <div class="card-body text-center">
+                    <i class="fas fa-exclamation-triangle fa-3x text-warning mb-2"></i>
+                    <h3 class="text-warning mb-0">
+                        {% for v in vehiculos_alerta %}{% if v.nivel == 'alerta' %}1{% endif %}{% endfor %}
+                        {{ vehiculos_alerta|length }}
+                    </h3>
+                    <p class="text-muted mb-0">Alertas de Mantenimiento</p>
+                    <small class="text-muted">Mantenimiento próximo</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-info">
+                <div class="card-body text-center">
+                    <i class="fas fa-info-circle fa-3x text-info mb-2"></i>
+                    <h3 class="text-info mb-0">0</h3>
+                    <p class="text-muted mb-0">Notificaciones</p>
+                    <small class="text-muted">Información general</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Alertas -->
+    <h4 class="mb-3"><i class="fas fa-list"></i> Alertas Activas</h4>
+
+    {% if vehiculos_alerta %}
+    {% for alerta in vehiculos_alerta %}
+    <div class="alert {% if alerta.nivel == 'critico' %}alert-danger{% else %}alert-warning{% endif %} d-flex align-items-center"
+        role="alert">
+        <div class="flex-shrink-0 me-3">
+            <i
+                class="fas {% if alerta.nivel == 'critico' %}fa-exclamation-circle{% else %}fa-exclamation-triangle{% endif %} fa-2x"></i>
+        </div>
+        <div class="flex-grow-1">
+            <h5 class="alert-heading mb-1">
+                {% if alerta.nivel == 'critico' %}
+                <i class="fas fa-exclamation-circle"></i> CRÍTICO:
+                {% else %}
+                <i class="fas fa-exclamation-triangle"></i> ALERTA:
+                {% endif %}
+                Mantenimiento Próximo - {{ alerta.vehiculo.patente }}
+            </h5>
+            <p class="mb-1">
+                <strong>{{ alerta.vehiculo.marca }} {{ alerta.vehiculo.modelo }}</strong> ({{ alerta.vehiculo.año }})
+            </p>
+            <p class="mb-1">
+                <i class="fas fa-tachometer-alt"></i> Kilometraje actual: <strong>{{
+                    alerta.vehiculo.kilometraje_actual|floatformat:0 }} km</strong>
+            </p>
+            <p class="mb-1">
+                <i class="fas fa-road"></i> Kilómetros restantes hasta mantenimiento:
+                <strong class="{% if alerta.km_restantes <= 500 %}text-danger{% else %}text-warning{% endif %}">
+                    {{ alerta.km_restantes }} km
+                </strong>
+            </p>
+            <p class="mb-1">
+                <i class="fas fa-map-marker-alt"></i> Centro: <strong>{{ alerta.vehiculo.centro_operacion.nombre
+                    }}</strong>
+            </p>
+            {% if alerta.nivel == 'critico' %}
+            <div class="mt-2">
+                <span class="badge bg-danger">
+                    <i class="fas fa-bolt"></i> ACCIÓN INMEDIATA REQUERIDA
+                </span>
+            </div>
+            {% endif %}
+        </div>
+        <div class="flex-shrink-0">
+            <a href="/admin/flota/mantenimiento/add/?vehiculo={{ alerta.vehiculo.id }}"
+                class="btn btn-sm {% if alerta.nivel == 'critico' %}btn-danger{% else %}btn-warning{% endif %}">
+                <i class="fas fa-wrench"></i> Programar
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="alert alert-success" role="alert">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-check-circle fa-2x me-3"></i>
+            <div>
+                <h5 class="alert-heading mb-1">¡Todo en Orden!</h5>
+                <p class="mb-0">No hay alertas activas en este momento. Todos los vehículos están dentro de los rangos
+                    seguros de mantenimiento.</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Información Adicional -->
+<div class="card-custom">
+    <h5><i class="fas fa-info-circle"></i> Información</h5>
+    <p class="text-muted mb-2">
+        Las alertas se generan automáticamente según los siguientes criterios:
+    </p>
+    <ul class="text-muted">
+        <li><strong class="text-danger">Crítico:</strong> Menos de 500 km hasta el próximo mantenimiento</li>
+        <li><strong class="text-warning">Alerta:</strong> Menos de 2,000 km hasta el próximo mantenimiento</li>
+        <li>Los mantenimientos preventivos se programan cada 10,000 km</li>
+    </ul>
+</div>
+{% endblock %}

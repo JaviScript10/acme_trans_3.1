@@ -1,0 +1,99 @@
+{% extends 'flota/base.html' %}
+
+{% block title %}Centro de Control Operativo - ACME Trans{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="card-custom">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="mb-1"><i class="fas fa-tachometer-alt"></i> Centro de Control Operativo</h1>
+            <p class="text-muted mb-0">Monitoreo en tiempo real de la flota ACME Trans</p>
+        </div>
+        <div class="text-end">
+            <h4 class="text-muted mb-0">{{ usuario.get_full_name|default:usuario.username }}</h4>
+            <small class="text-muted">{{ usuario.groups.first.name|default:"Usuario" }}</small>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas Generales -->
+<div class="row">
+    <div class="col-md-3">
+        <div class="card-custom text-center">
+            <i class="fas fa-truck fa-3x text-primary mb-3"></i>
+            <h2 class="text-primary mb-0">{{ total_vehiculos }}</h2>
+            <p class="text-muted mb-0">Total Vehículos</p>
+            <small class="text-muted">GC: {{ gc_total }} | MC: {{ mc_total }}</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card-custom text-center">
+            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+            <h2 class="text-success mb-0">{{ vehiculos_operativos }}</h2>
+            <p class="text-muted mb-0">Operativos</p>
+            <small class="text-muted">{{ vehiculos_operativos }} / {{ total_vehiculos }}</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card-custom text-center">
+            <i class="fas fa-wrench fa-3x text-warning mb-3"></i>
+            <h2 class="text-warning mb-0">{{ vehiculos_mantenimiento }}</h2>
+            <p class="text-muted mb-0">En Mantenimiento</p>
+            <small class="text-muted">{{ vehiculos_mantenimiento }} vehículos</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card-custom text-center">
+            <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+            <h2 class="text-danger mb-0">{{ vehiculos_fuera_servicio }}</h2>
+            <p class="text-muted mb-0">Fuera de Servicio</p>
+            <small class="text-muted">{{ vehiculos_fuera_servicio }} vehículos</small>
+        </div>
+    </div>
+</div>
+
+<!-- Estado por Centros -->
+<div class="card-custom">
+    <h4 class="mb-4"><i class="fas fa-map-marker-alt"></i> Estado por Centros Operacionales</h4>
+
+    {% for centro in centros_data %}
+    <div class="card mb-3"
+        style="border-left: 5px solid {% if centro.disponibilidad >= 90 %}#10b981{% elif centro.disponibilidad >= 75 %}#f59e0b{% else %}#ef4444{% endif %}">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-3">
+                    <h5 class="mb-0"><i class="fas fa-building"></i> {{ centro.nombre }}</h5>
+                </div>
+                <div class="col-md-5">
+                    <span class="badge bg-success me-2">Operativos: {{ centro.operativos }}</span>
+                    <span class="badge bg-warning me-2">Mantenimiento: {{ centro.mantenimiento }}</span>
+                    <span class="badge bg-danger me-2">Fuera Servicio: {{ centro.fuera_servicio }}</span>
+                    <span class="badge bg-primary">Total: {{ centro.total }}</span>
+                </div>
+                <div class="col-md-3">
+                    <div class="progress" style="height: 25px;">
+                        <div class="progress-bar {% if centro.disponibilidad >= 90 %}bg-success{% elif centro.disponibilidad >= 75 %}bg-warning{% else %}bg-danger{% endif %}"
+                            style="width: {{ centro.disponibilidad }}%">
+                            {{ centro.disponibilidad }}%
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-1 text-center">
+                    <h3
+                        class="mb-0 {% if centro.disponibilidad >= 90 %}text-success{% elif centro.disponibilidad >= 75 %}text-warning{% else %}text-danger{% endif %}">
+                        {{ centro.disponibilidad }}%
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Footer -->
+<div class="text-center text-white mt-4">
+    <p class="mb-0">© 2025 ACME Trans SpA - Sistema de Gestión de Flota</p>
+    <small>Desarrollado por Javier Ruiz | v1.0</small>
+</div>
+{% endblock %}

@@ -1,0 +1,192 @@
+{% extends 'flota/base.html' %}
+
+{% block title %}{{ titulo }} - ACME Trans{% endblock %}
+
+{% block content %}
+<div class="card-custom">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="fas fa-truck-loading"></i> {{ titulo }}</h2>
+            <p class="text-muted mb-0">Complete el formulario con los datos del vehículo</p>
+        </div>
+        <a href="{% url 'flota:vehiculos' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Cancelar
+        </a>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Errores generales del formulario -->
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <!-- Información Básica -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Información Básica</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ form.patente.label }}</label>
+                        {{ form.patente }}
+                        {% if form.patente.errors %}
+                        <div class="text-danger mt-1">{{ form.patente.errors }}</div>
+                        {% endif %}
+                        <small class="form-text text-muted">Formato: XX-1234 (dos letras, guión, cuatro números)</small>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ form.marca.label }}</label>
+                        {{ form.marca }}
+                        {% if form.marca.errors %}
+                        <div class="text-danger mt-1">{{ form.marca.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ form.modelo.label }}</label>
+                        {{ form.modelo }}
+                        {% if form.modelo.errors %}
+                        <div class="text-danger mt-1">{{ form.modelo.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ form.año.label }}</label>
+                        {{ form.año }}
+                        {% if form.año.errors %}
+                        <div class="text-danger mt-1">{{ form.año.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ form.tipo_capacidad.label }}</label>
+                        {{ form.tipo_capacidad }}
+                        {% if form.tipo_capacidad.errors %}
+                        <div class="text-danger mt-1">{{ form.tipo_capacidad.errors }}</div>
+                        {% endif %}
+                        <small class="form-text text-muted">GC: Gran Capacidad | MC: Mediana Capacidad</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Operación -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-cogs"></i> Datos Operacionales</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ form.centro_operacion.label }}</label>
+                        {{ form.centro_operacion }}
+                        {% if form.centro_operacion.errors %}
+                        <div class="text-danger mt-1">{{ form.centro_operacion.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ form.estado.label }}</label>
+                        {{ form.estado }}
+                        {% if form.estado.errors %}
+                        <div class="text-danger mt-1">{{ form.estado.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ form.kilometraje_actual.label }}</label>
+                        {{ form.kilometraje_actual }}
+                        {% if form.kilometraje_actual.errors %}
+                        <div class="text-danger mt-1">{{ form.kilometraje_actual.errors }}</div>
+                        {% endif %}
+                        <small class="form-text text-muted">Kilometraje en kilómetros</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Datos Técnicos (Opcionales) -->
+        <div class="card mb-4">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="fas fa-wrench"></i> Datos Técnicos (Opcional)</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ form.numero_chasis.label }}</label>
+                        {{ form.numero_chasis }}
+                        {% if form.numero_chasis.errors %}
+                        <div class="text-danger mt-1">{{ form.numero_chasis.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ form.numero_motor.label }}</label>
+                        {{ form.numero_motor }}
+                        {% if form.numero_motor.errors %}
+                        <div class="text-danger mt-1">{{ form.numero_motor.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Datos Financieros (Opcionales) -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-dollar-sign"></i> Datos Financieros (Opcional)</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ form.valor_adquisicion.label }}</label>
+                        {{ form.valor_adquisicion }}
+                        {% if form.valor_adquisicion.errors %}
+                        <div class="text-danger mt-1">{{ form.valor_adquisicion.errors }}</div>
+                        {% endif %}
+                        <small class="form-text text-muted">Valor en pesos chilenos (CLP)</small>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ form.fecha_adquisicion.label }}</label>
+                        {{ form.fecha_adquisicion }}
+                        {% if form.fecha_adquisicion.errors %}
+                        <div class="text-danger mt-1">{{ form.fecha_adquisicion.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Observaciones -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-sticky-note"></i> Observaciones (Opcional)</h5>
+            </div>
+            <div class="card-body">
+                <label class="form-label">{{ form.observaciones.label }}</label>
+                {{ form.observaciones }}
+                {% if form.observaciones.errors %}
+                <div class="text-danger mt-1">{{ form.observaciones.errors }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="d-flex justify-content-end gap-2">
+            <a href="{% url 'flota:vehiculos' %}" class="btn btn-secondary btn-lg">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+            <button type="submit" class="btn btn-custom btn-lg">
+                <i class="fas fa-save"></i> {{ boton }}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
