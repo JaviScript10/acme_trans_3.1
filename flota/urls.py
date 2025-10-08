@@ -22,6 +22,7 @@ urlpatterns = [
     path('mantenimientos/crear/', views.mantenimiento_crear_view, name='mantenimiento_crear'),
     path('mantenimientos/<int:pk>/', views.mantenimiento_detalle_view, name='mantenimiento_detalle'),
     path('mantenimientos/<int:pk>/completar/', views.mantenimiento_completar_view, name='mantenimiento_completar'),
+    path('mantenimientos/<int:pk>/reporte/', views.mantenimiento_reporte_view, name='mantenimiento_reporte'),  # ← AGREGAR ESTA
     path('mantenimientos/<int:pk>/eliminar/', views.mantenimiento_eliminar_view, name='mantenimiento_eliminar'),
     
     # API

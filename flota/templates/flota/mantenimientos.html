@@ -94,7 +94,7 @@
                     <th>Proveedor</th>
                     <th>Fecha</th>
                     <th>Estado</th>
-                    <th>Prioridad</th>
+                    <th>N° Reporte</th>
                     <th>Costo</th>
                     <th>Acciones</th>
                 </tr>
@@ -112,31 +112,37 @@
                     <td>{{ mant.fecha_programada|date:"d/m/Y" }}</td>
                     <td>
                         <span class="badge 
-                            {% if mant.estado == 'completado' %}bg-success
-                            {% elif mant.estado == 'en_proceso' %}bg-warning
-                            {% elif mant.estado == 'programado' %}bg-info
-                            {% else %}bg-danger{% endif %}">
+                        {% if mant.estado == 'completado' %}bg-success
+                        {% elif mant.estado == 'en_proceso' %}bg-warning
+                        {% elif mant.estado == 'programado' %}bg-info
+                        {% else %}bg-danger{% endif %}">
                             {{ mant.get_estado_display }}
                         </span>
+                        {% if mant.estado == 'completado' %}
+                        <br><small class="badge bg-primary mt-1">📄 Reportado</small>
+                        {% endif %}
                     </td>
                     <td>
-                        <span class="badge 
-                            {% if mant.prioridad == 'critica' %}bg-danger
-                            {% elif mant.prioridad == 'alta' %}bg-warning
-                            {% elif mant.prioridad == 'media' %}bg-info
-                            {% else %}bg-secondary{% endif %}">
-                            {{ mant.get_prioridad_display|upper }}
-                        </span>
+                        {% if mant.estado == 'completado' %}
+                        <span class="badge bg-dark">{{ mant.numero_reporte }}</span>
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
                     </td>
                     <td>${{ mant.costo_estimado|floatformat:0 }}</td>
                     <td>
-                        <a href="{% url 'flota:mantenimiento_detalle' mant.id %}" 
-                           class="btn btn-sm btn-outline-info" title="Ver">
+                        <a href="{% url 'flota:mantenimiento_detalle' mant.id %}" class="btn btn-sm btn-outline-info"
+                            title="Ver Detalle">
                             <i class="fas fa-eye"></i>
                         </a>
-                        {% if mant.estado == 'programado' %}
-                        <a href="{% url 'flota:mantenimiento_completar' mant.id %}" 
-                           class="btn btn-sm btn-outline-success" title="Completar">
+                        {% if mant.estado == 'completado' %}
+                        <a href="{% url 'flota:mantenimiento_reporte' mant.id %}" class="btn btn-sm btn-outline-success"
+                            title="Ver Reporte">
+                            <i class="fas fa-file-pdf"></i>
+                        </a>
+                        {% elif mant.estado == 'programado' %}
+                        <a href="{% url 'flota:mantenimiento_completar' mant.id %}"
+                            class="btn btn-sm btn-outline-success" title="Completar">
                             <i class="fas fa-check"></i>
                         </a>
                         {% endif %}

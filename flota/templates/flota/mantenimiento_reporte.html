@@ -1,0 +1,199 @@
+{% extends 'flota/base.html' %}
+
+{% block title %}{{ mantenimiento.numero_reporte }} - ACME Trans{% endblock %}
+
+{% block content %}
+<div class="card-custom">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="fas fa-file-pdf"></i> Reporte de Mantenimiento</h2>
+            <p class="text-muted mb-0">Número: <strong>{{ mantenimiento.numero_reporte }}</strong></p>
+        </div>
+        <a href="{% url 'flota:mantenimientos' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+    </div>
+
+    <!-- Alerta Simulación -->
+    <div class="alert alert-info mb-4">
+        <i class="fas fa-info-circle"></i> <strong>Simulación de Reporte Real:</strong>
+        En el sistema de producción, este reporte se generaría en PDF/Excel y se enviaría automáticamente.
+    </div>
+
+    <div class="row">
+        <!-- Información Principal -->
+        <div class="col-md-8">
+            <!-- Datos del Mantenimiento -->
+            <div class="card mb-3">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-clipboard-check"></i> Información del Mantenimiento</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <strong>Vehículo:</strong>
+                            <p class="mb-0">{{ mantenimiento.vehiculo.patente }} - {{ mantenimiento.vehiculo.marca }} {{
+                                mantenimiento.vehiculo.modelo }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>Centro Operacional:</strong>
+                            <p class="mb-0">{{ mantenimiento.vehiculo.centro_operacion.nombre }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>Tipo de Mantenimiento:</strong>
+                            <p class="mb-0">{{ mantenimiento.tipo_mantenimiento.nombre }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>Tipo:</strong>
+                            <p class="mb-0">
+                                <span
+                                    class="badge {% if mantenimiento.tipo == 'preventivo' %}bg-info{% else %}bg-warning{% endif %}">
+                                    {{ mantenimiento.get_tipo_display }}
+                                </span>
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>Fecha Programada:</strong>
+                            <p class="mb-0">{{ mantenimiento.fecha_programada|date:"d/m/Y" }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong>Fecha Realización:</strong>
+                            <p class="mb-0">
+                                {% if mantenimiento.fecha_realizacion %}
+                                {{ mantenimiento.fecha_realizacion|date:"d/m/Y" }}
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Análisis de Costos -->
+            <div class="card mb-3">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-dollar-sign"></i> Análisis de Costos</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <h6 class="text-muted">Costo Estimado</h6>
+                            <h3 class="text-primary">${{ mantenimiento.costo_estimado|floatformat:0 }}</h3>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-muted">Costo Real</h6>
+                            <h3 class="text-success">
+                                {% if mantenimiento.costo_real %}
+                                ${{ mantenimiento.costo_real|floatformat:0 }}
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </h3>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-muted">Diferencia</h6>
+                            <h3
+                                class="{% if diferencia_costo > 0 %}text-danger{% elif diferencia_costo < 0 %}text-success{% else %}text-secondary{% endif %}">
+                                {% if diferencia_costo %}
+                                {% if diferencia_costo > 0 %}+{% endif %}${{ diferencia_costo|floatformat:0 }}
+                                <br><small>({{ porcentaje_diferencia|floatformat:1 }}%)</small>
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Proveedor -->
+            <div class="card mb-3">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-building"></i> Proveedor de Servicio</h5>
+                </div>
+                <div class="card-body">
+                    <h6>{{ mantenimiento.proveedor.nombre }}</h6>
+                    <p class="mb-1"><i class="fas fa-phone"></i> {{ mantenimiento.proveedor.telefono }}</p>
+                    <p class="mb-1"><i class="fas fa-envelope"></i> {{ mantenimiento.proveedor.email }}</p>
+                    <p class="mb-0"><i class="fas fa-user"></i> {{ mantenimiento.proveedor.contacto_principal }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Lateral -->
+        <div class="col-md-4">
+            <!-- Distribución del Reporte -->
+            <div class="card mb-3 border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0"><i class="fas fa-share-nodes"></i> Distribución del Reporte</h6>
+                </div>
+                <div class="card-body">
+                    <h6 class="text-primary">📧 Enviado a:</h6>
+                    <ul class="list-unstyled mb-3">
+                        <li><i class="fas fa-check text-success"></i> Jefe de Mantenimiento</li>
+                        <li><i class="fas fa-check text-success"></i> Gerente de Operaciones</li>
+                    </ul>
+
+                    <h6 class="text-secondary">📋 Con Copia (CC):</h6>
+                    <ul class="list-unstyled mb-3">
+                        <li><i class="fas fa-check text-success"></i> Director General</li>
+                        <li><i class="fas fa-check text-success"></i> Jefe de Compras</li>
+                    </ul>
+
+                    <h6 class="text-info">📎 Formatos:</h6>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-file-pdf text-danger"></i> PDF (Detallado)</li>
+                        <li><i class="fas fa-file-excel text-success"></i> Excel (Análisis)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Ubicación -->
+            <div class="card mb-3">
+                <div class="card-body text-center">
+                    <i class="fas fa-server fa-3x text-info mb-2"></i>
+                    <h6>💾 Almacenado en:</h6>
+                    <p class="mb-0"><small class="text-muted">Sistema DocuTrans → Mantenimientos 2025</small></p>
+                </div>
+            </div>
+
+            <!-- Botones de Acción Simulados -->
+            <div class="d-grid gap-2">
+                <button class="btn btn-danger btn-lg"
+                    onclick="alert('📄 En el sistema real, aquí se descargaría el PDF del reporte.')">
+                    <i class="fas fa-file-pdf"></i> Descargar PDF
+                </button>
+                <button class="btn btn-success btn-lg"
+                    onclick="alert('📊 En el sistema real, aquí se descargaría el archivo Excel.')">
+                    <i class="fas fa-file-excel"></i> Descargar Excel
+                </button>
+                <button class="btn btn-primary btn-lg"
+                    onclick="alert('📧 En el sistema real, aquí se reenviaría el reporte por email.')">
+                    <i class="fas fa-envelope"></i> Reenviar Email
+                </button>
+            </div>
+
+            <!-- Info Usuario -->
+            <div class="card mt-3">
+                <div class="card-body">
+                    <small class="text-muted">Generado por:</small>
+                    <p class="mb-1">
+                        <strong>
+                            {% if mantenimiento.usuario_programacion.first_name %}
+                            {{ mantenimiento.usuario_programacion.first_name }} {{
+                            mantenimiento.usuario_programacion.last_name }}
+                            {% else %}
+                            {{ mantenimiento.usuario_programacion.username }}
+                            {% endif %}
+                        </strong>
+                    </p>
+                    <small class="text-muted">
+                        <i class="fas fa-calendar"></i> {{ mantenimiento.fecha_creacion|date:"d/m/Y H:i" }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

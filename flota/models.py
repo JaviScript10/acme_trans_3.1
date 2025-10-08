@@ -259,6 +259,12 @@ class Mantenimiento(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_modificacion = models.DateTimeField(auto_now=True)
     
+    def numero_reporte(self):
+        """Genera número único de reporte"""
+        if self.estado == 'completado':
+            return f"MT-2025-{self.pk:04d}"
+        return None
+    
     class Meta:
         verbose_name = "Mantenimiento"
         verbose_name_plural = "Mantenimientos"

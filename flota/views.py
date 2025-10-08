@@ -345,7 +345,27 @@ def mantenimiento_completar_view(request, pk):
         form = CompletarMantenimientoForm(request.POST, instance=mantenimiento)
         if form.is_valid():
             mantenimiento = form.save()
-            messages.success(request, f'✅ Mantenimiento de {mantenimiento.vehiculo.patente} actualizado.')
+            
+            # Generar número de reporte automático
+            numero_reporte = f"MT-2025-{mantenimiento.pk:04d}"
+            
+            # Mensaje de éxito con simulación de reporte
+            mensaje_html = f"""
+            <strong>✅ Mantenimiento completado exitosamente</strong><br><br>
+            <div style='background: #f0f9ff; padding: 15px; border-left: 4px solid #3b82f6; margin-top: 10px;'>
+                <strong>📊 Reporte Automático Generado</strong><br>
+                <hr style='margin: 8px 0; border-color: #bfdbfe;'>
+                <strong>Número:</strong> {numero_reporte}<br>
+                <strong>📧 Enviado a:</strong> Jefe de Mantenimiento, Gerente de Operaciones<br>
+                <strong>📎 Formatos:</strong> PDF, Excel (.xlsx)<br>
+                <strong>💾 Ubicación:</strong> Sistema DocuTrans → Mantenimientos 2025<br>
+                <small style='color: #64748b; margin-top: 8px; display: block;'>
+                    <em>En el sistema real, este reporte se enviaría automáticamente por email y se almacenaría en el servidor.</em>
+                </small>
+            </div>
+            """
+            
+            messages.success(request, mensaje_html, extra_tags='safe')
             return redirect('flota:mantenimiento_detalle', pk=mantenimiento.pk)
     else:
         form = CompletarMantenimientoForm(instance=mantenimiento)
@@ -357,6 +377,31 @@ def mantenimiento_completar_view(request, pk):
     }
     
     return render(request, 'flota/mantenimiento_completar.html', context)
+
+@login_required
+def mantenimiento_reporte_view(request, pk):
+    """Ver detalle del reporte de un mantenimiento completado"""
+    mantenimiento = get_object_or_404(Mantenimiento, pk=pk)
+    
+    if mantenimiento.estado != 'completado':
+        messages.warning(request, 'Este mantenimiento aún no está completado. No hay reporte disponible.')
+        return redirect('flota:mantenimiento_detalle', pk=pk)
+    
+    # Calcular diferencia de costo
+    diferencia = None
+    porcentaje_diferencia = None
+    if mantenimiento.costo_real and mantenimiento.costo_estimado:
+        diferencia = mantenimiento.costo_real - mantenimiento.costo_estimado
+        porcentaje_diferencia = (diferencia / mantenimiento.costo_estimado) * 100
+    
+    context = {
+        'mantenimiento': mantenimiento,
+        'diferencia_costo': diferencia,
+        'porcentaje_diferencia': porcentaje_diferencia,
+        'page_title': f'Reporte {mantenimiento.numero_reporte()}',
+    }
+    
+    return render(request, 'flota/mantenimiento_reporte.html', context)
 
 
 @login_required
