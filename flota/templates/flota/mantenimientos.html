@@ -1,73 +1,160 @@
 {% extends 'flota/base.html' %}
 
-{% block title %}{{ titulo }} - ACME Trans{% endblock %}
+{% block title %}Mantenimientos - ACME Trans{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="card">
-        <div class="card-header bg-primary text-white">
-            <h3><i class="fas fa-wrench"></i> {{ titulo }}</h3>
+<div class="card-custom">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="fas fa-wrench"></i> Sistema de Mantenimientos</h2>
+            <p class="text-muted mb-0">Gestión y seguimiento de mantenimientos</p>
         </div>
-        <div class="card-body">
-            <form method="post">
-                {% csrf_token %}
-                
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Vehículo *</label>
-                        {{ form.vehiculo }}
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Tipo de Mantenimiento *</label>
-                        {{ form.tipo_mantenimiento }}
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Tipo *</label>
-                        {{ form.tipo }}
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Prioridad *</label>
-                        {{ form.prioridad }}
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Fecha Programada *</label>
-                        {{ form.fecha_programada }}
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Kilometraje Programado *</label>
-                        {{ form.kilometraje_programado }}
-                    </div>
-                    <div class="col-md-12 mb-3">
-                        <label class="form-label">Proveedor *</label>
-                        {{ form.proveedor }}
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Costo Estimado *</label>
-                        {{ form.costo_estimado }}
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Tiempo Estimado (horas) *</label>
-                        {{ form.tiempo_estimado_horas }}
-                    </div>
-                    <div class="col-md-12 mb-3">
-                        <label class="form-label">Descripción *</label>
-                        {{ form.descripcion }}
-                    </div>
-                    <div class="col-md-12 mb-3">
-                        <label class="form-label">Observaciones</label>
-                        {{ form.observaciones_programacion }}
-                    </div>
+        <a href="{% url 'flota:mantenimiento_crear' %}" class="btn btn-custom">
+            <i class="fas fa-plus"></i> Programar Mantenimiento
+        </a>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-light text-center">
+                <div class="card-body">
+                    <h3 class="mb-0">{{ total }}</h3>
+                    <small class="text-muted">Total</small>
                 </div>
-                
-                <hr>
-                <button type="submit" class="btn btn-success btn-lg">
-                    <i class="fas fa-save"></i> {{ boton }}
-                </button>
-                <a href="{% url 'flota:mantenimientos' %}" class="btn btn-secondary btn-lg">
-                    <i class="fas fa-times"></i> Cancelar
-                </a>
-            </form>
+            </div>
         </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white text-center">
+                <div class="card-body">
+                    <h3 class="mb-0">{{ programados }}</h3>
+                    <small>Programados</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white text-center">
+                <div class="card-body">
+                    <h3 class="mb-0">{{ en_proceso }}</h3>
+                    <small>En Proceso</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white text-center">
+                <div class="card-body">
+                    <h3 class="mb-0">{{ completados }}</h3>
+                    <small>Completados</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-4">
+            <select name="estado" class="form-select">
+                <option value="">Todos los Estados</option>
+                <option value="programado">Programado</option>
+                <option value="en_proceso">En Proceso</option>
+                <option value="completado">Completado</option>
+                <option value="cancelado">Cancelado</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <select name="tipo" class="form-select">
+                <option value="">Todos los Tipos</option>
+                <option value="preventivo">Preventivo</option>
+                <option value="correctivo">Correctivo</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select name="prioridad" class="form-select">
+                <option value="">Prioridad</option>
+                <option value="critica">Crítica</option>
+                <option value="alta">Alta</option>
+                <option value="media">Media</option>
+                <option value="baja">Baja</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-custom w-100">
+                <i class="fas fa-filter"></i> Filtrar
+            </button>
+        </div>
+    </form>
+
+    <!-- Lista de Mantenimientos -->
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Vehículo</th>
+                    <th>Tipo</th>
+                    <th>Proveedor</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Prioridad</th>
+                    <th>Costo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mant in mantenimientos %}
+                <tr>
+                    <td>
+                        <a href="{% url 'flota:vehiculo_detalle' mant.vehiculo.id %}">
+                            <strong>{{ mant.vehiculo.patente }}</strong>
+                        </a>
+                    </td>
+                    <td>{{ mant.tipo_mantenimiento.nombre|truncatewords:3 }}</td>
+                    <td>{{ mant.proveedor.nombre }}</td>
+                    <td>{{ mant.fecha_programada|date:"d/m/Y" }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if mant.estado == 'completado' %}bg-success
+                            {% elif mant.estado == 'en_proceso' %}bg-warning
+                            {% elif mant.estado == 'programado' %}bg-info
+                            {% else %}bg-danger{% endif %}">
+                            {{ mant.get_estado_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge 
+                            {% if mant.prioridad == 'critica' %}bg-danger
+                            {% elif mant.prioridad == 'alta' %}bg-warning
+                            {% elif mant.prioridad == 'media' %}bg-info
+                            {% else %}bg-secondary{% endif %}">
+                            {{ mant.get_prioridad_display|upper }}
+                        </span>
+                    </td>
+                    <td>${{ mant.costo_estimado|floatformat:0 }}</td>
+                    <td>
+                        <a href="{% url 'flota:mantenimiento_detalle' mant.id %}" 
+                           class="btn btn-sm btn-outline-info" title="Ver">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        {% if mant.estado == 'programado' %}
+                        <a href="{% url 'flota:mantenimiento_completar' mant.id %}" 
+                           class="btn btn-sm btn-outline-success" title="Completar">
+                            <i class="fas fa-check"></i>
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center text-muted py-4">
+                        No hay mantenimientos registrados
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-3">
+        <p class="text-muted">Total: {{ mantenimientos.count }} mantenimiento(s)</p>
     </div>
 </div>
 {% endblock %}

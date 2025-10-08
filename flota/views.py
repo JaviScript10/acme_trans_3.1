@@ -301,7 +301,6 @@ def mantenimiento_crear_view(request):
             messages.success(request, f'✅ Mantenimiento programado exitosamente para {mantenimiento.vehiculo.patente}.')
             return redirect('flota:mantenimiento_detalle', pk=mantenimiento.pk)
     else:
-        # Si viene desde un vehículo específico
         vehiculo_id = request.GET.get('vehiculo')
         initial = {}
         if vehiculo_id:
@@ -380,16 +379,76 @@ def mantenimiento_eliminar_view(request, pk):
 
 
 # ==================== REPORTES ====================
+# ==================== REPORTES ====================
 @login_required
 def reportes_view(request):
-    """Centro de Reportes"""
+    """Sistema de Reportes"""
+    
+    # Si viene una acción de generar reporte
+    if request.GET.get('generar'):
+        tipo_reporte = request.GET.get('tipo')
+        
+        # Simular generación según tipo
+        mensajes_reporte = {
+            'vehiculos': {
+                'titulo': 'Reporte de Flota Vehicular',
+                'destinatarios': 'Gerente de Operaciones, Jefe de Flota',
+                'copia': 'Director General, Contador',
+                'formatos': 'PDF, Excel (.xlsx)',
+                'contenido': 'Listado completo de vehículos, estado, kilometraje, centro operacional y alertas de mantenimiento'
+            },
+            'mantenimientos': {
+                'titulo': 'Reporte de Mantenimientos',
+                'destinatarios': 'Jefe de Mantenimiento, Gerente de Operaciones',
+                'copia': 'Director General, Jefe de Compras',
+                'formatos': 'PDF, Excel (.xlsx)',
+                'contenido': 'Historial de mantenimientos, costos reales vs estimados, proveedores utilizados y próximos servicios programados'
+            },
+            'costos': {
+                'titulo': 'Análisis de Costos Operacionales',
+                'destinatarios': 'Gerente Financiero, Director General',
+                'copia': 'Contador, Gerente de Operaciones',
+                'formatos': 'PDF, Excel (.xlsx), Planilla de Cálculo Google Sheets',
+                'contenido': 'Costos por vehículo, costos por centro, análisis de desviaciones presupuestarias y proyecciones mensuales'
+            },
+            'rendimiento': {
+                'titulo': 'Indicadores de Rendimiento (KPIs)',
+                'destinatarios': 'Director General, Gerente de Operaciones',
+                'copia': 'Todos los jefes de área',
+                'formatos': 'PDF con gráficos, Dashboard interactivo Excel',
+                'contenido': 'Disponibilidad de flota, cumplimiento de mantenimientos, eficiencia operacional y comparativas por centro'
+            },
+            'alertas': {
+                'titulo': 'Reporte de Alertas y Acciones Requeridas',
+                'destinatarios': 'Jefe de Flota, Jefe de Mantenimiento',
+                'copia': 'Gerente de Operaciones',
+                'formatos': 'PDF, Email HTML',
+                'contenido': 'Vehículos con alertas críticas, mantenimientos vencidos, acciones pendientes y recomendaciones urgentes'
+            }
+        }
+        
+        info = mensajes_reporte.get(tipo_reporte, {})
+        
+        messages.success(
+            request,
+            f'✅ Reporte "{info.get("titulo", "")}" generado exitosamente. '
+            f'En la versión completa se enviaría automáticamente.'
+        )
+        
+        context = {
+            'reporte_generado': True,
+            'info_reporte': info,
+            'page_title': 'Reportes',
+        }
+        
+        return render(request, 'flota/reportes.html', context)
+    
+    # Vista normal
     context = {
         'page_title': 'Reportes',
     }
+    
     return render(request, 'flota/reportes.html', context)
-
-
-# ==================== ALERTAS ====================
 # ==================== ALERTAS ====================
 @login_required
 def alertas_view(request):

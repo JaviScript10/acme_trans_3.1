@@ -4,120 +4,233 @@
 
 {% block content %}
 <div class="card-custom">
-    <h2 class="mb-4"><i class="fas fa-chart-bar"></i> Centro de Reportes</h2>
-    <p class="text-muted">Análisis y reportes del sistema de gestión de flota</p>
+    <h2 class="mb-4"><i class="fas fa-file-pdf"></i> Sistema de Reportes Automatizados</h2>
+    <p class="text-muted">Generación y distribución automática de reportes operacionales</p>
 </div>
 
+<!-- Reporte Generado -->
+{% if reporte_generado %}
+<div class="card border-success mb-4">
+    <div class="card-header bg-success text-white">
+        <h4 class="mb-0"><i class="fas fa-check-circle"></i> Reporte Generado Exitosamente</h4>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info mb-3">
+            <h5 class="alert-heading"><i class="fas fa-info-circle"></i> Simulación de Sistema Real</h5>
+            <p class="mb-0">Esta es una <strong>demostración</strong>. En el sistema completo de producción, este reporte se generaría automáticamente y se distribuiría según la configuración.</p>
+        </div>
+
+        <h5 class="text-success mb-3"><i class="fas fa-file-alt"></i> {{ info_reporte.titulo }}</h5>
+        
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h6 class="text-primary"><i class="fas fa-users"></i> Destinatarios Principales</h6>
+                        <p class="mb-0">{{ info_reporte.destinatarios }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h6 class="text-secondary"><i class="fas fa-user-plus"></i> Con Copia (CC)</h6>
+                        <p class="mb-0">{{ info_reporte.copia }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h6 class="text-info"><i class="fas fa-file-export"></i> Formatos de Envío</h6>
+                        <p class="mb-0">{{ info_reporte.formatos }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h6 class="text-warning"><i class="fas fa-clock"></i> Frecuencia</h6>
+                        <p class="mb-0">Automático según configuración</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert alert-success mt-3">
+            <h6 class="alert-heading"><i class="fas fa-clipboard-check"></i> Contenido del Reporte</h6>
+            <p class="mb-0">{{ info_reporte.contenido }}</p>
+        </div>
+
+        <div class="mt-4 p-3 bg-light rounded">
+            <h6><i class="fas fa-envelope"></i> Acciones Automáticas en Sistema Real:</h6>
+            <ul class="mb-0">
+                <li>✅ Generación automática del reporte en múltiples formatos</li>
+                <li>✅ Envío por email a destinatarios principales</li>
+                <li>✅ Copia a supervisores y gerencia</li>
+                <li>✅ Almacenamiento en repositorio documental</li>
+                <li>✅ Notificación push a aplicación móvil</li>
+                <li>✅ Registro en bitácora del sistema</li>
+            </ul>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="{% url 'flota:reportes' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-arrow-left"></i> Volver a Reportes
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Catálogo de Reportes -->
 <div class="row">
-    <!-- Reporte Operacional -->
+    <!-- Reporte 1: Flota Vehicular -->
     <div class="col-md-6 mb-4">
-        <div class="card-custom h-100">
-            <div class="text-center mb-3">
-                <i class="fas fa-truck fa-4x text-primary"></i>
+        <div class="card h-100 border-primary">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-truck"></i> Reporte de Flota Vehicular</h5>
             </div>
-            <h4 class="text-center">Reporte Operacional</h4>
-            <p class="text-muted text-center">Estado de la flota y análisis de operaciones</p>
-            <ul class="list-unstyled">
-                <li><i class="fas fa-check text-success"></i> Estado de vehículos por centro</li>
-                <li><i class="fas fa-check text-success"></i> Disponibilidad de flota</li>
-                <li><i class="fas fa-check text-success"></i> Kilometrajes y rendimiento</li>
-                <li><i class="fas fa-check text-success"></i> Mantenimientos realizados</li>
-            </ul>
-            <button class="btn btn-custom w-100 mt-3">
-                <i class="fas fa-file-pdf"></i> Generar Reporte
-            </button>
+            <div class="card-body">
+                <p class="card-text">Listado completo de vehículos con estado actual, kilometraje, ubicación y alertas de mantenimiento preventivo.</p>
+                
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> Estado de cada vehículo</li>
+                    <li><i class="fas fa-check text-success"></i> Kilometraje actualizado</li>
+                    <li><i class="fas fa-check text-success"></i> Próximos mantenimientos</li>
+                    <li><i class="fas fa-check text-success"></i> Distribución por centro</li>
+                </ul>
+                
+                <div class="text-muted small mb-3">
+                    <i class="fas fa-file-pdf"></i> PDF, <i class="fas fa-file-excel"></i> Excel
+                </div>
+                
+                <a href="?generar=true&tipo=vehiculos" class="btn btn-primary w-100">
+                    <i class="fas fa-download"></i> Generar Reporte
+                </a>
+            </div>
         </div>
     </div>
 
-    <!-- Reporte Financiero -->
+    <!-- Reporte 2: Mantenimientos -->
     <div class="col-md-6 mb-4">
-        <div class="card-custom h-100">
-            <div class="text-center mb-3">
-                <i class="fas fa-dollar-sign fa-4x text-success"></i>
+        <div class="card h-100 border-success">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-wrench"></i> Reporte de Mantenimientos</h5>
             </div>
-            <h4 class="text-center">Análisis Financiero</h4>
-            <p class="text-muted text-center">Costos y rentabilidad de la flota</p>
-            <ul class="list-unstyled">
-                <li><i class="fas fa-check text-success"></i> Costos de mantenimiento</li>
-                <li><i class="fas fa-check text-success"></i> Gastos por vehículo</li>
-                <li><i class="fas fa-check text-success"></i> Comparativa de proveedores</li>
-                <li><i class="fas fa-check text-success"></i> ROI por centro operacional</li>
-            </ul>
-            <button class="btn btn-custom w-100 mt-3">
-                <i class="fas fa-file-excel"></i> Generar Reporte
-            </button>
+            <div class="card-body">
+                <p class="card-text">Historial completo de mantenimientos realizados, programados, costos y análisis de proveedores.</p>
+                
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> Historial detallado</li>
+                    <li><i class="fas fa-check text-success"></i> Costos real vs estimado</li>
+                    <li><i class="fas fa-check text-success"></i> Análisis de proveedores</li>
+                    <li><i class="fas fa-check text-success"></i> Próximos servicios</li>
+                </ul>
+                
+                <div class="text-muted small mb-3">
+                    <i class="fas fa-file-pdf"></i> PDF, <i class="fas fa-file-excel"></i> Excel
+                </div>
+                
+                <a href="?generar=true&tipo=mantenimientos" class="btn btn-success w-100">
+                    <i class="fas fa-download"></i> Generar Reporte
+                </a>
+            </div>
         </div>
     </div>
 
-    <!-- Dashboard Ejecutivo -->
+    <!-- Reporte 3: Costos -->
     <div class="col-md-6 mb-4">
-        <div class="card-custom h-100">
-            <div class="text-center mb-3">
-                <i class="fas fa-chart-pie fa-4x text-warning"></i>
+        <div class="card h-100 border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-dollar-sign"></i> Análisis de Costos Operacionales</h5>
             </div>
-            <h4 class="text-center">Dashboard Ejecutivo</h4>
-            <p class="text-muted text-center">KPIs y métricas estratégicas</p>
-            <ul class="list-unstyled">
-                <li><i class="fas fa-check text-success"></i> Indicadores clave de rendimiento</li>
-                <li><i class="fas fa-check text-success"></i> Eficiencia operacional</li>
-                <li><i class="fas fa-check text-success"></i> Tendencias y proyecciones</li>
-                <li><i class="fas fa-check text-success"></i> Análisis comparativo mensual</li>
-            </ul>
-            <button class="btn btn-custom w-100 mt-3">
-                <i class="fas fa-chart-line"></i> Ver Dashboard
-            </button>
+            <div class="card-body">
+                <p class="card-text">Análisis financiero detallado de costos por vehículo, centro operacional y proyecciones presupuestarias.</p>
+                
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> Costos por vehículo</li>
+                    <li><i class="fas fa-check text-success"></i> Costos por centro</li>
+                    <li><i class="fas fa-check text-success"></i> Desviaciones presupuestarias</li>
+                    <li><i class="fas fa-check text-success"></i> Proyecciones mensuales</li>
+                </ul>
+                
+                <div class="text-muted small mb-3">
+                    <i class="fas fa-file-pdf"></i> PDF, <i class="fas fa-file-excel"></i> Excel, <i class="fas fa-table"></i> Google Sheets
+                </div>
+                
+                <a href="?generar=true&tipo=costos" class="btn btn-warning w-100">
+                    <i class="fas fa-download"></i> Generar Reporte
+                </a>
+            </div>
         </div>
     </div>
 
-    <!-- Reporte de Mantenimientos -->
+    <!-- Reporte 4: KPIs -->
     <div class="col-md-6 mb-4">
-        <div class="card-custom h-100">
-            <div class="text-center mb-3">
-                <i class="fas fa-wrench fa-4x text-danger"></i>
+        <div class="card h-100 border-info">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-line"></i> Indicadores de Rendimiento (KPIs)</h5>
             </div>
-            <h4 class="text-center">Historial de Mantenimientos</h4>
-            <p class="text-muted text-center">Seguimiento completo de mantenimientos</p>
-            <ul class="list-unstyled">
-                <li><i class="fas fa-check text-success"></i> Mantenimientos programados vs realizados</li>
-                <li><i class="fas fa-check text-success"></i> Costos por tipo de mantenimiento</li>
-                <li><i class="fas fa-check text-success"></i> Desviaciones de presupuesto</li>
-                <li><i class="fas fa-check text-success"></i> Tiempos de inactividad</li>
-            </ul>
-            <button class="btn btn-custom w-100 mt-3">
-                <i class="fas fa-file-alt"></i> Generar Reporte
-            </button>
+            <div class="card-body">
+                <p class="card-text">Dashboard ejecutivo con indicadores clave de desempeño, disponibilidad y eficiencia operacional.</p>
+                
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> Disponibilidad de flota</li>
+                    <li><i class="fas fa-check text-success"></i> Cumplimiento mantenimientos</li>
+                    <li><i class="fas fa-check text-success"></i> Eficiencia operacional</li>
+                    <li><i class="fas fa-check text-success"></i> Comparativas por centro</li>
+                </ul>
+                
+                <div class="text-muted small mb-3">
+                    <i class="fas fa-file-pdf"></i> PDF con gráficos, <i class="fas fa-chart-bar"></i> Dashboard Excel
+                </div>
+                
+                <a href="?generar=true&tipo=rendimiento" class="btn btn-info w-100">
+                    <i class="fas fa-download"></i> Generar Reporte
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reporte 5: Alertas -->
+    <div class="col-md-12 mb-4">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="fas fa-bell"></i> Reporte de Alertas y Acciones Requeridas</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <p class="card-text">Reporte urgente de vehículos con alertas críticas, mantenimientos vencidos y acciones pendientes que requieren atención inmediata.</p>
+                        
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success"></i> Alertas críticas activas</li>
+                            <li><i class="fas fa-check text-success"></i> Mantenimientos vencidos</li>
+                            <li><i class="fas fa-check text-success"></i> Acciones pendientes</li>
+                            <li><i class="fas fa-check text-success"></i> Recomendaciones urgentes</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="text-muted small mb-3">
+                            <i class="fas fa-file-pdf"></i> PDF, <i class="fas fa-envelope"></i> Email HTML
+                        </div>
+                        
+                        <a href="?generar=true&tipo=alertas" class="btn btn-danger btn-lg w-100">
+                            <i class="fas fa-exclamation-triangle"></i> Generar Reporte Urgente
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Estadísticas Rápidas -->
-<div class="card-custom">
-    <h4 class="mb-4"><i class="fas fa-tachometer-alt"></i> Estadísticas Rápidas</h4>
-    <div class="row text-center">
-        <div class="col-md-3">
-            <div class="border rounded p-3">
-                <h3 class="text-primary mb-0">29</h3>
-                <small class="text-muted">Total Vehículos</small>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="border rounded p-3">
-                <h3 class="text-success mb-0">3</h3>
-                <small class="text-muted">Centros Operacionales</small>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="border rounded p-3">
-                <h3 class="text-warning mb-0">-</h3>
-                <small class="text-muted">Mantenimientos Este Mes</small>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="border rounded p-3">
-                <h3 class="text-info mb-0">-</h3>
-                <small class="text-muted">Costo Total Mantenimientos</small>
-            </div>
-        </div>
-    </div>
+<!-- Información Adicional -->
+<div class="card-custom bg-light">
+    <h5><i class="fas fa-info-circle"></i> Información del Sistema de Reportes</h5>
+    <p class="mb-2"><strong>Automatización:</strong> Los reportes se pueden programar para generación y envío automático diario, semanal o mensual.</p>
+    <p class="mb-2"><strong>Personalización:</strong> Cada reporte puede personalizarse según las necesidades específicas de cada destinatario.</p>
+    <p class="mb-0"><strong>Seguridad:</strong> Los reportes contienen información sensible y se envían mediante canales seguros con encriptación.</p>
 </div>
 {% endblock %}

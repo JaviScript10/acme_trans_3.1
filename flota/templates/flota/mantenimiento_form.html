@@ -7,10 +7,10 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2><i class="fas fa-wrench"></i> {{ titulo }}</h2>
-            <p class="text-muted mb-0">Complete los datos del mantenimiento</p>
+            <p class="text-muted mb-0">Complete los datos del mantenimiento programado</p>
         </div>
         <a href="{% url 'flota:mantenimientos' %}" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left"></i> Cancelar
+            <i class="fas fa-arrow-left"></i> Volver
         </a>
     </div>
 
@@ -19,54 +19,54 @@
         
         {% if form.non_field_errors %}
         <div class="alert alert-danger">
-            {{ form.non_field_errors }}
+            <i class="fas fa-exclamation-circle"></i> {{ form.non_field_errors }}
         </div>
         {% endif %}
 
-        <!-- Información del Vehículo -->
+        <!-- Sección 1: Vehículo y Tipo -->
         <div class="card mb-4">
             <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="fas fa-truck"></i> Vehículo y Tipo</h5>
+                <h5 class="mb-0"><i class="fas fa-truck"></i> Información del Vehículo</h5>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">{{ form.vehiculo.label }}</label>
+                        <label class="form-label fw-bold">{{ form.vehiculo.label }}</label>
                         {{ form.vehiculo }}
                         {% if form.vehiculo.errors %}
-                        <div class="text-danger mt-1">{{ form.vehiculo.errors }}</div>
+                        <div class="text-danger mt-1"><small>{{ form.vehiculo.errors }}</small></div>
                         {% endif %}
                     </div>
                     
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">{{ form.tipo_mantenimiento.label }}</label>
+                        <label class="form-label fw-bold">{{ form.tipo_mantenimiento.label }}</label>
                         {{ form.tipo_mantenimiento }}
                         {% if form.tipo_mantenimiento.errors %}
-                        <div class="text-danger mt-1">{{ form.tipo_mantenimiento.errors }}</div>
+                        <div class="text-danger mt-1"><small>{{ form.tipo_mantenimiento.errors }}</small></div>
                         {% endif %}
                     </div>
                     
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">{{ form.tipo.label }}</label>
+                        <label class="form-label fw-bold">{{ form.tipo.label }}</label>
                         {{ form.tipo }}
                         {% if form.tipo.errors %}
-                        <div class="text-danger mt-1">{{ form.tipo.errors }}</div>
+                        <div class="text-danger mt-1"><small>{{ form.tipo.errors }}</small></div>
                         {% endif %}
-                        <small class="form-text text-muted">Preventivo o Correctivo</small>
+                        <small class="text-muted d-block mt-1">Preventivo o Correctivo</small>
                     </div>
                     
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">{{ form.prioridad.label }}</label>
+                        <label class="form-label fw-bold">{{ form.prioridad.label }}</label>
                         {{ form.prioridad }}
                         {% if form.prioridad.errors %}
-                        <div class="text-danger mt-1">{{ form.prioridad.errors }}</div>
+                        <div class="text-danger mt-1"><small>{{ form.prioridad.errors }}</small></div>
                         {% endif %}
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Programación -->
+        <!-- Sección 2: Programación -->
         <div class="card mb-4">
             <div class="card-header bg-success text-white">
                 <h5 class="mb-0"><i class="fas fa-calendar-check"></i> Programación</h5>
@@ -74,91 +74,97 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">{{ form.fecha_programada.label }}</label>
+                        <label class="form-label fw-bold">{{ form.fecha_programada.label }}</label>
                         {{ form.fecha_programada }}
                         {% if form.fecha_programada.errors %}
-                        <div class="text-danger mt-1">{{ form.fecha_programada.errors }}</div>
+                        <div class="text-danger mt-1"><small>{{ form.fecha_programada.errors }}</small></div>
                         {% endif %}
                     </div>
                     
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">{{ form.kilometraje_programado.label }}</label>
+                        <label class="form-label fw-bold">{{ form.kilometraje_programado.label }}</label>
                         {{ form.kilometraje_programado }}
                         {% if form.kilometraje_programado.errors %}
-                        <div class="text-danger mt-1">{{ form.kilometraje_programado.errors }}</div>
+                        <div class="text-danger mt-1"><small>{{ form.kilometraje_programado.errors }}</small></div>
                         {% endif %}
-                        <small class="form-text text-muted">Kilometraje al momento del mantenimiento</small>
+                        <small class="text-muted d-block mt-1">Kilometraje estimado al momento del servicio</small>
                     </div>
                     
                     <div class="col-md-12 mb-3">
-                        <label class="form-label">{{ form.proveedor.label }}</label>
+                        <label class="form-label fw-bold">{{ form.proveedor.label }}</label>
                         {{ form.proveedor }}
                         {% if form.proveedor.errors %}
-                        <div class="text-danger mt-1">{{ form.proveedor.errors }}</div>
+                        <div class="text-danger mt-1"><small>{{ form.proveedor.errors }}</small></div>
                         {% endif %}
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Costos y Tiempos -->
+        <!-- Sección 3: Costos y Tiempos -->
         <div class="card mb-4">
             <div class="card-header bg-warning text-dark">
-                <h5 class="mb-0"><i class="fas fa-dollar-sign"></i> Estimación de Costos</h5>
+                <h5 class="mb-0"><i class="fas fa-dollar-sign"></i> Estimación de Costos y Tiempo</h5>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">{{ form.costo_estimado.label }}</label>
-                        {{ form.costo_estimado }}
+                        <label class="form-label fw-bold">{{ form.costo_estimado.label }}</label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text">$</span>
+                            {{ form.costo_estimado }}
+                            <span class="input-group-text">CLP</span>
+                        </div>
                         {% if form.costo_estimado.errors %}
-                        <div class="text-danger mt-1">{{ form.costo_estimado.errors }}</div>
+                        <div class="text-danger mt-1"><small>{{ form.costo_estimado.errors }}</small></div>
                         {% endif %}
-                        <small class="form-text text-muted">Costo estimado en pesos chilenos</small>
                     </div>
                     
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">{{ form.tiempo_estimado_horas.label }}</label>
-                        {{ form.tiempo_estimado_horas }}
+                        <label class="form-label fw-bold">{{ form.tiempo_estimado_horas.label }}</label>
+                        <div class="input-group input-group-lg">
+                            {{ form.tiempo_estimado_horas }}
+                            <span class="input-group-text">horas</span>
+                        </div>
                         {% if form.tiempo_estimado_horas.errors %}
-                        <div class="text-danger mt-1">{{ form.tiempo_estimado_horas.errors }}</div>
+                        <div class="text-danger mt-1"><small>{{ form.tiempo_estimado_horas.errors }}</small></div>
                         {% endif %}
-                        <small class="form-text text-muted">Tiempo estimado en horas</small>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Descripción -->
+        <!-- Sección 4: Descripción -->
         <div class="card mb-4">
             <div class="card-header bg-info text-white">
                 <h5 class="mb-0"><i class="fas fa-clipboard"></i> Descripción del Trabajo</h5>
             </div>
             <div class="card-body">
                 <div class="mb-3">
-                    <label class="form-label">{{ form.descripcion.label }}</label>
+                    <label class="form-label fw-bold">{{ form.descripcion.label }}</label>
                     {{ form.descripcion }}
                     {% if form.descripcion.errors %}
-                    <div class="text-danger mt-1">{{ form.descripcion.errors }}</div>
+                    <div class="text-danger mt-1"><small>{{ form.descripcion.errors }}</small></div>
                     {% endif %}
+                    <small class="text-muted d-block mt-1">Describa detalladamente los trabajos a realizar</small>
                 </div>
                 
                 <div class="mb-3">
-                    <label class="form-label">{{ form.observaciones_programacion.label }}</label>
+                    <label class="form-label fw-bold">{{ form.observaciones_programacion.label }}</label>
                     {{ form.observaciones_programacion }}
                     {% if form.observaciones_programacion.errors %}
-                    <div class="text-danger mt-1">{{ form.observaciones_programacion.errors }}</div>
+                    <div class="text-danger mt-1"><small>{{ form.observaciones_programacion.errors }}</small></div>
                     {% endif %}
                 </div>
             </div>
         </div>
 
         <!-- Botones -->
-        <div class="d-flex justify-content-end gap-2">
-            <a href="{% url 'flota:mantenimientos' %}" class="btn btn-secondary btn-lg">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <a href="{% url 'flota:mantenimientos' %}" class="btn btn-secondary btn-lg px-5">
                 <i class="fas fa-times"></i> Cancelar
             </a>
-            <button type="submit" class="btn btn-custom btn-lg">
+            <button type="submit" class="btn btn-custom btn-lg px-5">
                 <i class="fas fa-save"></i> {{ boton }}
             </button>
         </div>
