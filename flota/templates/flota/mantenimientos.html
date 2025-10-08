@@ -1,68 +1,73 @@
 {% extends 'flota/base.html' %}
 
-{% block title %}Mantenimientos - ACME Trans{% endblock %}
+{% block title %}{{ titulo }} - ACME Trans{% endblock %}
 
 {% block content %}
-<div class="card-custom">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2><i class="fas fa-wrench"></i> Sistema de Mantenimientos</h2>
-            <p class="text-muted mb-0">Gestión y seguimiento de mantenimientos</p>
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3><i class="fas fa-wrench"></i> {{ titulo }}</h3>
         </div>
-        <a href="/admin/flota/mantenimiento/add/" class="btn btn-custom">
-            <i class="fas fa-plus"></i> Programar Mantenimiento
-        </a>
-    </div>
-
-    <!-- Lista de Mantenimientos -->
-    <div class="table-responsive">
-        <table class="table table-hover">
-            <thead class="table-light">
-                <tr>
-                    <th>Vehículo</th>
-                    <th>Tipo</th>
-                    <th>Proveedor</th>
-                    <th>Fecha Programada</th>
-                    <th>Estado</th>
-                    <th>Prioridad</th>
-                    <th>Costo</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for mant in mantenimientos %}
-                <tr>
-                    <td><strong>{{ mant.vehiculo.patente }}</strong></td>
-                    <td>{{ mant.tipo_mantenimiento.nombre }}</td>
-                    <td>{{ mant.proveedor.nombre }}</td>
-                    <td>{{ mant.fecha_programada|date:"d/m/Y" }}</td>
-                    <td>
-                        <span
-                            class="badge {% if mant.estado == 'completado' %}bg-success{% elif mant.estado == 'en_proceso' %}bg-warning{% elif mant.estado == 'programado' %}bg-info{% else %}bg-danger{% endif %}">
-                            {{ mant.get_estado_display }}
-                        </span>
-                    </td>
-                    <td>
-                        <span
-                            class="badge {% if mant.prioridad == 'critica' %}bg-danger{% elif mant.prioridad == 'alta' %}bg-warning{% elif mant.prioridad == 'media' %}bg-info{% else %}bg-secondary{% endif %}">
-                            {{ mant.get_prioridad_display|upper }}
-                        </span>
-                    </td>
-                    <td>${{ mant.costo_estimado|floatformat:0 }}</td>
-                    <td>
-                        <a href="/admin/flota/mantenimiento/{{ mant.id }}/change/"
-                            class="btn btn-sm btn-outline-primary">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="8" class="text-center text-muted">No hay mantenimientos registrados</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Vehículo *</label>
+                        {{ form.vehiculo }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Tipo de Mantenimiento *</label>
+                        {{ form.tipo_mantenimiento }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Tipo *</label>
+                        {{ form.tipo }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Prioridad *</label>
+                        {{ form.prioridad }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Fecha Programada *</label>
+                        {{ form.fecha_programada }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Kilometraje Programado *</label>
+                        {{ form.kilometraje_programado }}
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label">Proveedor *</label>
+                        {{ form.proveedor }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Costo Estimado *</label>
+                        {{ form.costo_estimado }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Tiempo Estimado (horas) *</label>
+                        {{ form.tiempo_estimado_horas }}
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label">Descripción *</label>
+                        {{ form.descripcion }}
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label">Observaciones</label>
+                        {{ form.observaciones_programacion }}
+                    </div>
+                </div>
+                
+                <hr>
+                <button type="submit" class="btn btn-success btn-lg">
+                    <i class="fas fa-save"></i> {{ boton }}
+                </button>
+                <a href="{% url 'flota:mantenimientos' %}" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}

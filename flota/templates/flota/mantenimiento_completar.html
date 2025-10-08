@@ -1,0 +1,147 @@
+{% extends 'flota/base.html' %}
+
+{% block title %}Completar Mantenimiento - ACME Trans{% endblock %}
+
+{% block content %}
+<div class="card-custom">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="fas fa-check-circle"></i> Completar Mantenimiento</h2>
+            <p class="text-muted mb-0">{{ mantenimiento.vehiculo.patente }} - {{ mantenimiento.tipo_mantenimiento.nombre }}</p>
+        </div>
+        <a href="{% url 'flota:mantenimiento_detalle' mantenimiento.pk %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Cancelar
+        </a>
+    </div>
+
+    <!-- Información del Mantenimiento Programado -->
+    <div class="alert alert-info mb-4">
+        <h5 class="alert-heading"><i class="fas fa-info-circle"></i> Información del Mantenimiento Programado</h5>
+        <div class="row">
+            <div class="col-md-6">
+                <p class="mb-1"><strong>Vehículo:</strong> {{ mantenimiento.vehiculo.patente }} - {{ mantenimiento.vehiculo.marca }} {{ mantenimiento.vehiculo.modelo }}</p>
+                <p class="mb-1"><strong>Fecha Programada:</strong> {{ mantenimiento.fecha_programada|date:"d/m/Y" }}</p>
+                <p class="mb-0"><strong>Costo Estimado:</strong> ${{ mantenimiento.costo_estimado|floatformat:0 }}</p>
+            </div>
+            <div class="col-md-6">
+                <p class="mb-1"><strong>Tipo:</strong> {{ mantenimiento.get_tipo_display }}</p>
+                <p class="mb-1"><strong>Proveedor:</strong> {{ mantenimiento.proveedor.nombre }}</p>
+                <p class="mb-0"><strong>Tiempo Estimado:</strong> {{ mantenimiento.tiempo_estimado_horas }} horas</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de Finalización -->
+    <form method="post">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <div class="card border-success mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-clipboard-check"></i> Registrar Datos Reales del Mantenimiento</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Estado -->
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label fw-bold">{{ form.estado.label }}</label>
+                        {{ form.estado }}
+                        {% if form.estado.errors %}
+                        <div class="text-danger mt-1">{{ form.estado.errors }}</div>
+                        {% endif %}
+                        <small class="form-text text-muted d-block mt-1">
+                            Selecciona "Completado" para finalizar el mantenimiento
+                        </small>
+                    </div>
+                    
+                    <!-- Fecha Real -->
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label fw-bold">{{ form.fecha_realizacion.label }}</label>
+                        {{ form.fecha_realizacion }}
+                        {% if form.fecha_realizacion.errors %}
+                        <div class="text-danger mt-1">{{ form.fecha_realizacion.errors }}</div>
+                        {% endif %}
+                        <small class="form-text text-muted d-block mt-1">
+                            Fecha en que se completó el mantenimiento
+                        </small>
+                    </div>
+                    
+                    <!-- Costo Real - CAMPO PRINCIPAL -->
+                    <div class="col-md-12 mb-3">
+                        <label class="form-label fw-bold text-success fs-5">
+                            <i class="fas fa-dollar-sign"></i> {{ form.costo_real.label }}
+                        </label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-success text-white">$</span>
+                            {{ form.costo_real }}
+                            <span class="input-group-text">CLP</span>
+                        </div>
+                        {% if form.costo_real.errors %}
+                        <div class="text-danger mt-1">{{ form.costo_real.errors }}</div>
+                        {% endif %}
+                        <small class="form-text text-muted d-block mt-2">
+                            <i class="fas fa-info-circle"></i> <strong>Ingrese aquí el costo real final del mantenimiento</strong>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparativa Visual -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card border-primary">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h6 class="mb-0">💰 ESTIMADO INICIAL</h6>
+                    </div>
+                    <div class="card-body text-center">
+                        <h2 class="text-primary mb-0">${{ mantenimiento.costo_estimado|floatformat:0 }}</h2>
+                        <small class="text-muted">Presupuesto original</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-success">
+                    <div class="card-header bg-success text-white text-center">
+                        <h6 class="mb-0">✅ COSTO REAL</h6>
+                    </div>
+                    <div class="card-body text-center">
+                        <h2 class="text-success mb-0" id="costo-real-preview">$0</h2>
+                        <small class="text-muted">Ingrese el valor arriba ↑</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <a href="{% url 'flota:mantenimiento_detalle' mantenimiento.pk %}" class="btn btn-secondary btn-lg">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+            <button type="submit" class="btn btn-success btn-lg">
+                <i class="fas fa-check-circle"></i> Guardar y Completar Mantenimiento
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+// Actualizar preview del costo real
+document.addEventListener('DOMContentLoaded', function() {
+    const costoInput = document.getElementById('id_costo_real');
+    const preview = document.getElementById('costo-real-preview');
+    
+    if (costoInput) {
+        costoInput.addEventListener('input', function() {
+            const valor = parseFloat(this.value) || 0;
+            preview.textContent = '$' + valor.toLocaleString('es-CL');
+        });
+    }
+});
+</script>
+{% endblock %}

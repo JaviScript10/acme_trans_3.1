@@ -3,7 +3,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 import re
-from .models import Vehiculo, CentroOperacional
+from .models import Vehiculo, CentroOperacional, Mantenimiento
 
 
 class VehiculoForm(forms.ModelForm):
@@ -155,3 +155,123 @@ class ActualizarKilometrajeForm(forms.ModelForm):
             )
         
         return kilometraje
+
+
+class MantenimientoForm(forms.ModelForm):
+    """Formulario para programar mantenimientos"""
+    
+    class Meta:
+        model = Mantenimiento
+        fields = [
+            'vehiculo', 'tipo_mantenimiento', 'tipo', 'prioridad',
+            'fecha_programada', 'kilometraje_programado', 'proveedor',
+            'costo_estimado', 'tiempo_estimado_horas', 'descripcion',
+            'observaciones_programacion'
+        ]
+        
+        widgets = {
+            'vehiculo': forms.Select(attrs={'class': 'form-select form-select-lg'}),
+            'tipo_mantenimiento': forms.Select(attrs={'class': 'form-select form-select-lg'}),
+            'tipo': forms.Select(attrs={'class': 'form-select form-select-lg'}),
+            'prioridad': forms.Select(attrs={'class': 'form-select form-select-lg'}),
+            'fecha_programada': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'form-control form-control-lg',
+            }),
+            'kilometraje_programado': forms.NumberInput(attrs={
+                'class': 'form-control form-control-lg',
+                'min': 0,
+            }),
+            'proveedor': forms.Select(attrs={'class': 'form-select form-select-lg'}),
+            'costo_estimado': forms.NumberInput(attrs={
+                'class': 'form-control form-control-lg',
+                'min': 0,
+                'step': '1000',
+            }),
+            'tiempo_estimado_horas': forms.NumberInput(attrs={
+                'class': 'form-control form-control-lg',
+                'min': 1,
+                'max': 72,
+                'value': 4
+            }),
+            'descripcion': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Describir detalladamente el trabajo a realizar...',
+            }),
+            'observaciones_programacion': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 2,
+                'placeholder': 'Observaciones adicionales...'
+            }),
+        }
+        
+        labels = {
+            'vehiculo': 'Vehículo *',
+            'tipo_mantenimiento': 'Tipo de Mantenimiento *',
+            'tipo': 'Tipo *',
+            'prioridad': 'Prioridad *',
+            'fecha_programada': 'Fecha Programada *',
+            'kilometraje_programado': 'Kilometraje Programado *',
+            'proveedor': 'Proveedor *',
+            'costo_estimado': 'Costo Estimado (CLP) *',
+            'tiempo_estimado_horas': 'Tiempo Estimado (horas) *',
+            'descripcion': 'Descripción del Trabajo *',
+            'observaciones_programacion': 'Observaciones',
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Si hay un vehículo en instance Y tiene pk (es edición)
+        if self.instance.pk and self.instance.vehiculo:
+            self.fields['kilometraje_programado'].initial = self.instance.vehiculo.kilometraje_actual
+    
+    def clean_fecha_programada(self):
+        """Validación de fecha programada."""
+        fecha = self.cleaned_data['fecha_programada']
+        
+        if fecha < timezone.now().date():
+            raise ValidationError('La fecha programada no puede ser en el pasado.')
+        
+        return fecha
+    
+    def clean_kilometraje_programado(self):
+        """Validación de kilometraje programado."""
+        kilometraje = self.cleaned_data['kilometraje_programado']
+        vehiculo = self.cleaned_data.get('vehiculo')
+        
+        if vehiculo and kilometraje < vehiculo.kilometraje_actual:
+            raise ValidationError(
+                f'El kilometraje programado no puede ser menor al actual ({vehiculo.kilometraje_actual:,} km).'
+            )
+        
+        return kilometraje
+
+
+class CompletarMantenimientoForm(forms.ModelForm):
+    """Formulario para completar un mantenimiento ya programado"""
+    
+    class Meta:
+        model = Mantenimiento
+        fields = [
+            'estado', 'fecha_realizacion', 'costo_real'
+        ]
+        
+        widgets = {
+            'estado': forms.Select(attrs={'class': 'form-select form-select-lg'}),
+            'fecha_realizacion': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'form-control form-control-lg',
+            }),
+            'costo_real': forms.NumberInput(attrs={
+                'class': 'form-control form-control-lg',
+                'min': 0,
+                'step': '1000',
+            }),
+        }
+        
+        labels = {
+            'estado': 'Estado del Mantenimiento *',
+            'fecha_realizacion': 'Fecha de Realización',
+            'costo_real': 'Costo Real (CLP)',
+        }

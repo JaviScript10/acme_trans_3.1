@@ -7,131 +7,217 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2><i class="fas fa-bell"></i> Centro de Alertas</h2>
-            <p class="text-muted mb-0">Notificaciones y alertas del sistema</p>
+            <p class="text-muted mb-0">Monitoreo de alertas y notificaciones del sistema</p>
         </div>
         <div>
-            <span class="badge bg-danger fs-5">{{ vehiculos_alerta|length }}</span>
-            <span class="text-muted">alertas activas</span>
+            <span class="badge bg-danger fs-5">{{ total_alertas }}</span>
+            <span class="text-muted ms-2">alertas activas</span>
         </div>
     </div>
 
-    <!-- Resumen de Alertas -->
+    <!-- Estadísticas de Alertas -->
     <div class="row mb-4">
-        <div class="col-md-4">
+        <div class="col-md-3">
+            <div class="card border-secondary">
+                <div class="card-body text-center">
+                    <i class="fas fa-bell fa-2x text-secondary mb-2"></i>
+                    <h3 class="mb-0">{{ total_alertas }}</h3>
+                    <small class="text-muted">Total Alertas</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
             <div class="card border-danger">
                 <div class="card-body text-center">
-                    <i class="fas fa-exclamation-circle fa-3x text-danger mb-2"></i>
-                    <h3 class="text-danger mb-0">
-                        {% for v in vehiculos_alerta %}{% if v.nivel == 'critico' %}1{% endif %}{% endfor %}
-                        {{ vehiculos_alerta|length|add:"-1"|default:"0" }}
-                    </h3>
-                    <p class="text-muted mb-0">Alertas Críticas</p>
-                    <small class="text-muted">Requieren atención inmediata</small>
+                    <i class="fas fa-exclamation-circle fa-2x text-danger mb-2"></i>
+                    <h3 class="text-danger mb-0">{{ alertas_criticas }}</h3>
+                    <small class="text-muted">Críticas</small>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card border-warning">
                 <div class="card-body text-center">
-                    <i class="fas fa-exclamation-triangle fa-3x text-warning mb-2"></i>
-                    <h3 class="text-warning mb-0">
-                        {% for v in vehiculos_alerta %}{% if v.nivel == 'alerta' %}1{% endif %}{% endfor %}
-                        {{ vehiculos_alerta|length }}
-                    </h3>
-                    <p class="text-muted mb-0">Alertas de Mantenimiento</p>
-                    <small class="text-muted">Mantenimiento próximo</small>
+                    <i class="fas fa-exclamation-triangle fa-2x text-warning mb-2"></i>
+                    <h3 class="text-warning mb-0">{{ alertas_altas }}</h3>
+                    <small class="text-muted">Altas</small>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card border-info">
                 <div class="card-body text-center">
-                    <i class="fas fa-info-circle fa-3x text-info mb-2"></i>
-                    <h3 class="text-info mb-0">0</h3>
-                    <p class="text-muted mb-0">Notificaciones</p>
-                    <small class="text-muted">Información general</small>
+                    <i class="fas fa-info-circle fa-2x text-info mb-2"></i>
+                    <h3 class="text-info mb-0">{{ alertas_medias }}</h3>
+                    <small class="text-muted">Medias</small>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Filtros -->
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-4">
+            <select name="nivel" class="form-select" onchange="this.form.submit()">
+                <option value="">Todas las Alertas</option>
+                <option value="critico" {% if request.GET.nivel == 'critico' %}selected{% endif %}>🔴 Críticas</option>
+                <option value="alta" {% if request.GET.nivel == 'alta' %}selected{% endif %}>🟠 Altas</option>
+                <option value="media" {% if request.GET.nivel == 'media' %}selected{% endif %}>🟡 Medias</option>
+            </select>
+        </div>
+        <div class="col-md-8 text-end">
+            <a href="{% url 'flota:alertas' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-redo"></i> Limpiar Filtros
+            </a>
+        </div>
+    </form>
 
     <!-- Lista de Alertas -->
     <h4 class="mb-3"><i class="fas fa-list"></i> Alertas Activas</h4>
-
+    
     {% if vehiculos_alerta %}
-    {% for alerta in vehiculos_alerta %}
-    <div class="alert {% if alerta.nivel == 'critico' %}alert-danger{% else %}alert-warning{% endif %} d-flex align-items-center"
-        role="alert">
-        <div class="flex-shrink-0 me-3">
-            <i
-                class="fas {% if alerta.nivel == 'critico' %}fa-exclamation-circle{% else %}fa-exclamation-triangle{% endif %} fa-2x"></i>
-        </div>
-        <div class="flex-grow-1">
-            <h5 class="alert-heading mb-1">
+        {% for alerta in vehiculos_alerta %}
+        <div class="alert 
+            {% if alerta.nivel == 'critico' %}alert-danger border-danger
+            {% elif alerta.nivel == 'alta' %}alert-warning border-warning
+            {% else %}alert-info border-info{% endif %} 
+            d-flex align-items-start mb-3 shadow-sm" role="alert">
+            
+            <div class="flex-shrink-0 me-3">
+                <i class="fas 
+                    {% if alerta.nivel == 'critico' %}fa-exclamation-circle
+                    {% elif alerta.nivel == 'alta' %}fa-exclamation-triangle
+                    {% else %}fa-info-circle{% endif %} 
+                    fa-3x"></i>
+            </div>
+            
+            <div class="flex-grow-1">
+                <!-- Encabezado -->
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="alert-heading mb-1">
+                        {% if alerta.nivel == 'critico' %}
+                            🔴 CRÍTICO
+                        {% elif alerta.nivel == 'alta' %}
+                            🟠 ALTA PRIORIDAD
+                        {% else %}
+                            🟡 ATENCIÓN
+                        {% endif %}
+                        - {{ alerta.vehiculo.patente }}
+                    </h5>
+                    <span class="badge 
+                        {% if alerta.nivel == 'critico' %}bg-danger
+                        {% elif alerta.nivel == 'alta' %}bg-warning text-dark
+                        {% else %}bg-info{% endif %}">
+                        {{ alerta.nivel|upper }}
+                    </span>
+                </div>
+
+                <!-- Información del Vehículo -->
+                <div class="mb-2">
+                    <strong>{{ alerta.vehiculo.marca }} {{ alerta.vehiculo.modelo }}</strong> ({{ alerta.vehiculo.año }})
+                </div>
+
+                <!-- Detalle de la Alerta -->
+                <div class="mb-2">
+                    <i class="fas fa-exclamation-triangle"></i> <strong>{{ alerta.mensaje }}</strong>
+                </div>
+
+                <!-- Información Adicional -->
+                <div class="row mb-2">
+                    <div class="col-md-4">
+                        <i class="fas fa-tachometer-alt"></i> 
+                        <strong>Kilometraje:</strong> {{ alerta.vehiculo.kilometraje_actual|floatformat:0 }} km
+                    </div>
+                    {% if alerta.km_restantes %}
+                    <div class="col-md-4">
+                        <i class="fas fa-road"></i> 
+                        <strong>Km restantes:</strong> 
+                        <span class="
+                            {% if alerta.km_restantes <= 500 %}text-danger fw-bold
+                            {% elif alerta.km_restantes <= 1000 %}text-warning fw-bold
+                            {% else %}text-info{% endif %}">
+                            {{ alerta.km_restantes }} km
+                        </span>
+                    </div>
+                    <div class="col-md-4">
+                        <i class="fas fa-wrench"></i> 
+                        <strong>Próximo mantenimiento:</strong> {{ alerta.vehiculo.proximo_mantenimiento_km|floatformat:0 }} km
+                    </div>
+                    {% endif %}
+                    <div class="col-md-4">
+                        <i class="fas fa-map-marker-alt"></i> 
+                        <strong>Centro:</strong> {{ alerta.vehiculo.centro_operacion.nombre }}
+                    </div>
+                </div>
+
+                <!-- Mensaje de Acción -->
                 {% if alerta.nivel == 'critico' %}
-                <i class="fas fa-exclamation-circle"></i> CRÍTICO:
-                {% else %}
-                <i class="fas fa-exclamation-triangle"></i> ALERTA:
+                <div class="mt-2 p-2 bg-danger bg-opacity-10 border border-danger rounded">
+                    <strong><i class="fas fa-bolt"></i> ACCIÓN INMEDIATA REQUERIDA:</strong>
+                    Este vehículo debe programarse para mantenimiento urgente.
+                </div>
                 {% endif %}
-                Mantenimiento Próximo - {{ alerta.vehiculo.patente }}
-            </h5>
-            <p class="mb-1">
-                <strong>{{ alerta.vehiculo.marca }} {{ alerta.vehiculo.modelo }}</strong> ({{ alerta.vehiculo.año }})
-            </p>
-            <p class="mb-1">
-                <i class="fas fa-tachometer-alt"></i> Kilometraje actual: <strong>{{
-                    alerta.vehiculo.kilometraje_actual|floatformat:0 }} km</strong>
-            </p>
-            <p class="mb-1">
-                <i class="fas fa-road"></i> Kilómetros restantes hasta mantenimiento:
-                <strong class="{% if alerta.km_restantes <= 500 %}text-danger{% else %}text-warning{% endif %}">
-                    {{ alerta.km_restantes }} km
-                </strong>
-            </p>
-            <p class="mb-1">
-                <i class="fas fa-map-marker-alt"></i> Centro: <strong>{{ alerta.vehiculo.centro_operacion.nombre
-                    }}</strong>
-            </p>
-            {% if alerta.nivel == 'critico' %}
-            <div class="mt-2">
-                <span class="badge bg-danger">
-                    <i class="fas fa-bolt"></i> ACCIÓN INMEDIATA REQUERIDA
-                </span>
             </div>
-            {% endif %}
+
+            <!-- Botones de Acción -->
+            <div class="flex-shrink-0 ms-3">
+                <a href="{% url 'flota:vehiculo_detalle' alerta.vehiculo.pk %}" 
+                   class="btn btn-sm btn-outline-primary mb-2 d-block">
+                    <i class="fas fa-eye"></i> Ver Vehículo
+                </a>
+                <a href="{% url 'flota:mantenimiento_crear' %}?vehiculo={{ alerta.vehiculo.id }}" 
+                   class="btn btn-sm 
+                   {% if alerta.nivel == 'critico' %}btn-danger
+                   {% elif alerta.nivel == 'alta' %}btn-warning
+                   {% else %}btn-info{% endif %} d-block">
+                    <i class="fas fa-wrench"></i> Programar
+                </a>
+            </div>
         </div>
-        <div class="flex-shrink-0">
-            <a href="/admin/flota/mantenimiento/add/?vehiculo={{ alerta.vehiculo.id }}"
-                class="btn btn-sm {% if alerta.nivel == 'critico' %}btn-danger{% else %}btn-warning{% endif %}">
-                <i class="fas fa-wrench"></i> Programar
-            </a>
-        </div>
-    </div>
-    {% endfor %}
+        {% endfor %}
     {% else %}
-    <div class="alert alert-success" role="alert">
-        <div class="d-flex align-items-center">
-            <i class="fas fa-check-circle fa-2x me-3"></i>
-            <div>
-                <h5 class="alert-heading mb-1">¡Todo en Orden!</h5>
-                <p class="mb-0">No hay alertas activas en este momento. Todos los vehículos están dentro de los rangos
-                    seguros de mantenimiento.</p>
+        <div class="alert alert-success" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-check-circle fa-3x me-3"></i>
+                <div>
+                    <h5 class="alert-heading mb-1">¡Todo en Orden!</h5>
+                    <p class="mb-0">No hay alertas activas en este momento. Todos los vehículos están dentro de los rangos seguros de mantenimiento.</p>
+                </div>
             </div>
         </div>
-    </div>
     {% endif %}
 </div>
 
-<!-- Información Adicional -->
-<div class="card-custom">
-    <h5><i class="fas fa-info-circle"></i> Información</h5>
-    <p class="text-muted mb-2">
-        Las alertas se generan automáticamente según los siguientes criterios:
-    </p>
-    <ul class="text-muted">
-        <li><strong class="text-danger">Crítico:</strong> Menos de 500 km hasta el próximo mantenimiento</li>
-        <li><strong class="text-warning">Alerta:</strong> Menos de 2,000 km hasta el próximo mantenimiento</li>
-        <li>Los mantenimientos preventivos se programan cada 10,000 km</li>
-    </ul>
+<!-- Información sobre Niveles de Alerta -->
+<div class="card-custom mt-4">
+    <h5><i class="fas fa-info-circle"></i> Información sobre Niveles de Alerta</h5>
+    <div class="row mt-3">
+        <div class="col-md-4">
+            <div class="d-flex align-items-center mb-2">
+                <i class="fas fa-circle text-danger me-2"></i>
+                <strong>Crítico:</strong>
+            </div>
+            <small class="text-muted">Menos de 500 km hasta el próximo mantenimiento. Requiere atención inmediata.</small>
+        </div>
+        <div class="col-md-4">
+            <div class="d-flex align-items-center mb-2">
+                <i class="fas fa-circle text-warning me-2"></i>
+                <strong>Alta:</strong>
+            </div>
+            <small class="text-muted">Entre 500 y 1,000 km hasta el mantenimiento. Programar pronto.</small>
+        </div>
+        <div class="col-md-4">
+            <div class="d-flex align-items-center mb-2">
+                <i class="fas fa-circle text-info me-2"></i>
+                <strong>Media:</strong>
+            </div>
+            <small class="text-muted">Entre 1,000 y 2,000 km. Monitorear y planificar.</small>
+        </div>
+    </div>
+    <hr class="mt-3">
+    <small class="text-muted">
+        <i class="fas fa-lightbulb"></i> <strong>Nota:</strong> Los mantenimientos preventivos se programan cada 10,000 km. 
+        Las alertas se generan automáticamente según el kilometraje actual de cada vehículo.
+    </small>
 </div>
 {% endblock %}

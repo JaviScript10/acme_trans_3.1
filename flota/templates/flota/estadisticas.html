@@ -1,0 +1,279 @@
+{% extends 'flota/base.html' %}
+
+{% block title %}Estadísticas - ACME Trans{% endblock %}
+
+{% block extra_css %}
+<style>
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+.chart-container-large {
+    position: relative;
+    height: 350px;
+    width: 100%;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card-custom">
+    <h2 class="mb-4"><i class="fas fa-chart-line"></i> Estadísticas y Análisis</h2>
+    <p class="text-muted">Visualización de datos operacionales en tiempo real</p>
+</div>
+
+<!-- KPIs Rápidos -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center border-primary">
+            <div class="card-body">
+                <h3 class="text-primary">{{ total_vehiculos }}</h3>
+                <small class="text-muted">Total Vehículos</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center border-success">
+            <div class="card-body">
+                <h3 class="text-success">{{ vehiculos_operativos }}</h3>
+                <small class="text-muted">Operativos</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center border-warning">
+            <div class="card-body">
+                <h3 class="text-warning">{{ vehiculos_mantenimiento }}</h3>
+                <small class="text-muted">En Mantenimiento</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center border-danger">
+            <div class="card-body">
+                <h3 class="text-danger">{{ vehiculos_fuera_servicio }}</h3>
+                <small class="text-muted">Fuera de Servicio</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gráficos Fila 1 -->
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-chart-pie"></i> Distribución por Tipo</h5>
+                <div class="chart-container">
+                    <canvas id="tipoVehiculosChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-chart-bar"></i> Disponibilidad por Centro</h5>
+                <div class="chart-container">
+                    <canvas id="disponibilidadChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gráfico Grande -->
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-chart-line"></i> Estado de Vehículos por Centro</h5>
+                <div class="chart-container-large">
+                    <canvas id="estadoCentrosChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gráficos Fila 2 -->
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-chart-doughnut"></i> Estado General de la Flota</h5>
+                <div class="chart-container">
+                    <canvas id="estadoGeneralChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-percentage"></i> Radar por Centro</h5>
+                <div class="chart-container">
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Datos desde Django
+const gcTotal = {{ gc_total }};
+const mcTotal = {{ mc_total }};
+const operativos = {{ vehiculos_operativos }};
+const enMantenimiento = {{ vehiculos_mantenimiento }};
+const fueraServicio = {{ vehiculos_fuera_servicio }};
+const centrosData = JSON.parse('{{ centros_data_json|escapejs }}');
+
+const centrosNombres = centrosData.map(c => c.nombre);
+const centrosDisponibilidad = centrosData.map(c => c.disponibilidad);
+const centrosOperativos = centrosData.map(c => c.operativos);
+const centrosMantenimiento = centrosData.map(c => c.mantenimiento);
+const centrosFueraServicio = centrosData.map(c => c.fuera_servicio);
+
+// Gráfico 1: Tipo de Vehículos (Pie)
+new Chart(document.getElementById('tipoVehiculosChart'), {
+    type: 'pie',
+    data: {
+        labels: ['Gran Capacidad (GC)', 'Mediana Capacidad (MC)'],
+        datasets: [{
+            data: [gcTotal, mcTotal],
+            backgroundColor: ['#667eea', '#17a2b8'],
+            borderWidth: 2,
+            borderColor: '#fff'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: 'bottom' }
+        }
+    }
+});
+
+// Gráfico 2: Disponibilidad por Centro
+new Chart(document.getElementById('disponibilidadChart'), {
+    type: 'bar',
+    data: {
+        labels: centrosNombres,
+        datasets: [{
+            label: 'Disponibilidad (%)',
+            data: centrosDisponibilidad,
+            backgroundColor: centrosDisponibilidad.map(v => v >= 90 ? '#10b981' : v >= 75 ? '#f59e0b' : '#ef4444'),
+            borderRadius: 5
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: { 
+                beginAtZero: true, 
+                max: 100,
+                ticks: { callback: value => value + '%' }
+            }
+        },
+        plugins: {
+            legend: { display: false }
+        }
+    }
+});
+
+// Gráfico 3: Estado por Centro (Stacked)
+new Chart(document.getElementById('estadoCentrosChart'), {
+    type: 'bar',
+    data: {
+        labels: centrosNombres,
+        datasets: [
+            { 
+                label: 'Operativos', 
+                data: centrosOperativos, 
+                backgroundColor: '#10b981',
+                borderRadius: 5
+            },
+            { 
+                label: 'En Mantenimiento', 
+                data: centrosMantenimiento, 
+                backgroundColor: '#f59e0b',
+                borderRadius: 5
+            },
+            { 
+                label: 'Fuera de Servicio', 
+                data: centrosFueraServicio, 
+                backgroundColor: '#ef4444',
+                borderRadius: 5
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            x: { stacked: true },
+            y: { stacked: true, beginAtZero: true }
+        },
+        plugins: {
+            legend: { position: 'bottom' }
+        }
+    }
+});
+
+// Gráfico 4: Estado General (Doughnut)
+new Chart(document.getElementById('estadoGeneralChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Operativos', 'En Mantenimiento', 'Fuera de Servicio'],
+        datasets: [{
+            data: [operativos, enMantenimiento, fueraServicio],
+            backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+            borderWidth: 2,
+            borderColor: '#fff'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: 'bottom' }
+        }
+    }
+});
+
+// Gráfico 5: Radar por Centro
+new Chart(document.getElementById('radarChart'), {
+    type: 'radar',
+    data: {
+        labels: centrosNombres,
+        datasets: [{
+            label: 'Disponibilidad',
+            data: centrosDisponibilidad,
+            backgroundColor: 'rgba(102, 126, 234, 0.2)',
+            borderColor: '#667eea',
+            borderWidth: 2,
+            pointBackgroundColor: '#667eea',
+            pointBorderColor: '#fff'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            r: { 
+                beginAtZero: true, 
+                max: 100,
+                ticks: { callback: value => value + '%' }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
